@@ -1,4 +1,85 @@
+// Navitron
+// ===
+//
+// Navitron is a tree list menu with sliding animations for
+// drilling up or down a list item.
+//
+//
+// Notes:
+//
+// 1. Used to absolute position the sliding panes.
+// 2. Set min-height as fallback height since the panes
+//    are all absolute positioned.
+// 3. Avoid content bleed through.
 
 .navitron {
+    position: relative; // 1
 
+    overflow: hidden;
+    min-height: 320px; // 2
+
+    background: white; // 3
+}
+
+
+// Navitron: Nested Panes Container
+// ---
+//
+// This is the container that holds all the nested sliding panes
+// that are offsetted outside of Navitron wrapper.
+//
+//
+// Notes:
+//
+// 1. Hide nested sliding panes by default.
+//
+//    [Note] Must keep this as 'display: none' otherwise you can
+//    crash the browser translating too many divs at once. This
+//    also helps with Pinny's opening/closing animation.
+//
+// 2. Used for unique sliding effects. For example: Flipping
+//    the next pane over like a page.
+
+.navitron__nested {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10;
+
+    transform: translate3d(100%, 0, 0);
+
+    perspective: 1000px; // 2
+
+    .navitron__pane {
+        display: none; // 1
+    }
+}
+
+
+// Navitron: Sliding Pane
+// ---
+//
+// This is the sliding pane that gets animated in and out of view.
+//
+//
+// Notes:
+//
+// 1. Avoid content bleed through.
+
+.navitron__pane {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    overflow-y: auto;
+
+    background: white; // 1
+
+    transform: translate3d(0, 0, 0);
+
+    -webkit-overflow-scrolling: touch;
 }

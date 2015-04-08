@@ -22,7 +22,7 @@
         Navitron.__super__.call(this, element, options, Navitron.DEFAULTS);
     }
 
-    Navitron.VERSION = '0';
+    Navitron.VERSION = '0.0.1';
 
     Navitron.DEFAULTS = {
         shiftAmount: 20,
