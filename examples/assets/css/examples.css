@@ -6,3 +6,75 @@ html {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     -webkit-text-size-adjust: 100%;
 }
+
+h3 {
+    margin: 0;
+    padding: 16px;
+
+    background: #292929;
+
+    color: white;
+    font-size: 16px;
+    font-weight: normal;
+    text-align: center;
+}
+
+ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+li {
+    margin: 0;
+    padding: 0;
+}
+
+button,
+a {
+    position: relative;
+
+    display: block;
+    border: none;
+    padding: 16px;
+    width: 100%;
+
+    background: none;
+
+    color: white;
+    font-size: 14px;
+    text-align: left;
+}
+
+.navitron,
+.navitron__pane {
+    background: #4d4d4d;
+}
+
+.navitron__pane {
+    box-shadow: 0 0 20px 10px rgba(0,0,0,0.5);
+}
+
+.navitron__prev-pane::before {
+    content: '';
+
+    display: inline-block;
+    margin-right: 12px;
+    margin-left: -5px;
+    border: 5px solid transparent;
+    border-right-color: white;
+}
+
+.navitron__next-pane::after {
+    content: '';
+
+    position: absolute;
+    top: 50%;
+    right: 16px;
+
+    display: block;
+    margin-top: -5px;
+    margin-right: -5px;
+    border: 5px solid transparent;
+    border-left-color: white;
+}

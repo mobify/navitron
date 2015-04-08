@@ -1,7 +1,7 @@
 .navitron {
   position: relative;
   overflow: hidden;
-  min-height: 320px;
+  min-height: 200px;
   background: white; }
 
 .navitron__nested {
