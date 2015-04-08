@@ -1,0 +1,8 @@
+* {
+    box-sizing: border-box;
+}
+
+html {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    -webkit-text-size-adjust: 100%;
+}

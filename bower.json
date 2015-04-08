@@ -1,0 +1,27 @@
+{
+  "name": "navitron",
+  "version": "0.0.1",
+  "homepage": "https://github.com/mobify/navitron",
+  "authors": [
+    "Mobify <jobs@mobify.com>"
+  ],
+  "description": "A mobile first content fly-in UI plugin",
+  "main": "dist/navitron.min.js",
+  "keywords": [
+    "navitron",
+    "fly-in",
+    "modal",
+    "mobile",
+    "mobify"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "./!(src|dist|lib|templates)"
+  ],
+  "dependencies": {
+        "plugin": "~3.0.0",
+        "requirejs-text": "~2.0.12",
+        "requirejs": "~2.1.14",
+        "mobify-velocity": "~1.1.2"
+}
+}
