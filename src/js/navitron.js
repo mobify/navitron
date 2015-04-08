@@ -7,7 +7,7 @@
         ], factory);
     } else {
         var framework = window.Zepto || window.jQuery;
-        factory(framework, window.Plugin, Velocity);
+        factory(framework, window.Plugin, window.Velocity);
     }
 }(function($, Plugin, Velocity) {
     var selectors = {
