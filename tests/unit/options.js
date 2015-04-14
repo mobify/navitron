@@ -44,6 +44,11 @@ define([
                 expect(navitron.options.fadeOpacityTo).to.equal(Navitron.DEFAULTS.fadeOpacityTo);
                 expect(navitron.options.fadeOpacityTo).to.be.a('number');
             });
+
+            it('correctly defines mobileHA', function() {
+                expect(navitron.options.mobileHA).to.equal(Navitron.DEFAULTS.mobileHA);
+                expect(navitron.options.mobileHA).to.be.a('boolean');
+            });
         });
 
         describe('throws for invalid options', function() {
@@ -52,7 +57,7 @@ define([
                     navitron = new Navitron($element, {
                         fadeOpacityTo: 2.0
                     });
-                }).to.throw('The fadeToOpacity value should be a value between 0 and 1.0');
+                }).to.throw('The fadeOpacityTo value should be a value between 0 and 1.0');
             });
         });
 
@@ -85,6 +90,11 @@ define([
             it('correctly defines fadeOpacityTo', function() {
                 expect(navitron.options.fadeOpacityTo).to.equal(0.75);
                 expect(navitron.options.fadeOpacityTo).to.be.a('number');
+            });
+
+            it('correctly defines mobileHA', function() {
+                expect(navitron.options.mobileHA).to.equal(false);
+                expect(navitron.options.mobileHA).to.be.a('boolean');
             });
         });
     });

@@ -50,7 +50,7 @@
         },
 
         destroy: function() {
-            this.$element.removeData(this.name);
+            this.$navitron.removeData(this.name);
         },
 
         /**
@@ -91,7 +91,7 @@
 
         _validateOptions: function() {
             if (this.options.fadeOpacityTo < 0 || this.options.fadeOpacityTo > 1) {
-                throw new Error('The fadeToOpacity value should be a value between 0 and 1.0.');
+                throw new Error('The fadeOpacityTo value should be a value between 0 and 1.0.');
             }
         },
 
@@ -111,25 +111,24 @@
              */
             this.$navitron.on('click', selectors.NEXT_PANE, function() {
                 var $button = $(this);
-                var targetPaneId = $button.data('target-level');
-                var currentPaneId = $button.data('current-level');
-                var $targetMenu = plugin._getTarget(targetPaneId);
+                var buttonProperties = plugin._getButtonLevelData($button);
+                var $targetMenu = plugin._getTarget(buttonProperties.targetPaneId);
 
                 // We don't want to shift/slide anything if we're clicking on an anchor
                 // or the target pane does not exist
-                if ($button.is('a') || $button.has('a').length > 0 || $targetMenu.length < 1) {
-                    if ($targetMenu.length < 1) {
-                        throw new Error('Target pane with ID: ' + targetPaneId + ' does not exist!');
+                if ($button.is('a') || $button.has('a').length || !$targetMenu.length) {
+                    if (!$targetMenu.length) {
+                        throw new Error('Target pane with ID: ' + buttonProperties.targetPaneId + ' does not exist!');
                     }
 
                     return;
                 }
 
                 // Slide in next level
-                plugin.slideIn(targetPaneId);
+                plugin.slideIn(buttonProperties.targetPaneId);
 
                 // Shift away current Level
-                plugin.shiftOut(currentPaneId, $button);
+                plugin.shiftOut(buttonProperties.currentPaneId, $button);
             });
 
             /**
@@ -137,24 +136,22 @@
              */
             this.$navitron.on('click', selectors.PREV_PANE, function() {
                 var $button = $(this);
-                var targetPaneId = $button.data('target-level');
-                var currentPaneId = $button.data('current-level');
+                var buttonProperties = plugin._getButtonLevelData($button);
 
                 // Slide out current level
-                plugin.slideOut(currentPaneId);
+                plugin.slideOut(buttonProperties.currentPaneId);
 
                 // Shift in current Level
-                plugin.shiftIn(targetPaneId, currentPaneId);
+                plugin.shiftIn(buttonProperties.targetPaneId, buttonProperties.currentPaneId);
             });
         },
 
         slideIn: function(targetPaneId) {
-            if (targetPaneId === undefined) {
+            if (!targetPaneId) {
                 return;
             }
 
             var plugin = this;
-
             var $targetMenu = this._getTarget(targetPaneId);
 
             Velocity.animate(
@@ -166,6 +163,7 @@
                     display: 'block',
                     begin: function() {
                         plugin._trigger('slide');
+
                         // Setting z-index to make sure pane sliding in will always be on top
                         // of pane that's being shifted out
                         $targetMenu.css({
@@ -183,10 +181,11 @@
         },
 
         slideOut: function(currentPaneId) {
-            if (currentPaneId === undefined) {
+            if (!currentPaneId) {
                 return;
             }
 
+            var plugin = this;
             var $currentMenu = this._getTarget(currentPaneId);
 
             Velocity.animate(
@@ -197,6 +196,8 @@
                 $.extend(true, {}, this.animationDefaults, {
                     display: 'none',
                     begin: function() {
+                        plugin._trigger('slide');
+
                         // Setting z-index to make sure pane shifting out will always be above
                         // the pane that's being shifted back in
                         $currentMenu.css({
@@ -205,16 +206,19 @@
                     },
                     complete: function() {
                         $currentMenu.attr('aria-hidden', 'true');
+
+                        plugin._trigger('slid');
                     }
                 })
             );
         },
 
         shiftIn: function(targetPaneId, buttonTargetId) {
-            if (targetPaneId === undefined) {
+            if (!targetPaneId) {
                 return;
             }
 
+            var plugin = this;
             var $shiftMenu = this._getTarget(targetPaneId);
             var translateValue = this._getTranslateX($shiftMenu);
 
@@ -227,6 +231,8 @@
                 $.extend(true, {}, this.animationDefaults, {
                     display: 'block',
                     begin: function() {
+                        plugin._trigger('shift');
+
                         // Setting z-index to make sure pane shifting in will always be below
                         // of pane that's being slided out
                         $shiftMenu.css({
@@ -237,16 +243,19 @@
                         $shiftMenu.attr('aria-hidden', 'false');
                         $shiftMenu.find(selectors.NEXT_PANE + '[data-target-level="' + buttonTargetId + '"]')
                             .attr('aria-expanded', 'false');
+
+                        plugin._trigger('shifted');
                     }
                 })
             );
         },
 
         shiftOut: function(currentPaneId, $button) {
-            if (currentPaneId === undefined) {
+            if (!currentPaneId) {
                 return;
             }
 
+            var plugin = this;
             var $shiftMenu = this._getTarget(currentPaneId);
             var translateValue = this._getTranslateX($shiftMenu);
 
@@ -259,6 +268,8 @@
                 $.extend(true, {}, this.animationDefaults, {
                     display: 'none',
                     begin: function() {
+                        plugin._trigger('shift');
+
                         // Setting z-index to make sure pane shifting out will always be below
                         // the pane that's being slided in
                         $shiftMenu.css({
@@ -268,6 +279,8 @@
                     complete: function() {
                         $shiftMenu.attr('aria-hidden', 'true');
                         $button.attr('aria-expanded', 'true');
+
+                        plugin._trigger('shifted');
                     }
                 })
             );
@@ -279,6 +292,13 @@
 
         _getTranslateX: function($element) {
             return parseFloat(Velocity.CSS.getPropertyValue($element[0], 'translateX'));
+        },
+
+        _getButtonLevelData: function($button) {
+            return {
+                targetPaneId: $button.data('target-level'),
+                currentPaneId: $button.data('current-level')
+            };
         }
     });
 
