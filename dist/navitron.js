@@ -29,14 +29,22 @@
         duration: 200,
         easing: 'swing',
         fadeOpacityTo: 0.25,
-        mobileHA: true
+        mobileHA: true,
+        shift: $.noop,
+        shifted: $.noop,
+        slide: $.noop,
+        slid: $.noop
     };
 
     Plugin.create('navitron', Navitron, {
         _init: function(element) {
             this.$navitron = $(element);
 
+            this._validateOptions();
+
             this._addAccessibility();
+
+            this._setAnimationDefaults();
 
             this._bindEvents();
         },
@@ -81,6 +89,20 @@
             });
         },
 
+        _validateOptions: function() {
+            if (this.options.fadeOpacityTo < 0 || this.options.fadeOpacityTo > 1) {
+                throw new Error('The fadeToOpacity value should be a value between 0 and 1.0.');
+            }
+        },
+
+        _setAnimationDefaults: function() {
+            this.animationDefaults = {
+                easing: this.options.easing,
+                duration: this.options.duration,
+                mobileHA: this.options.mobileHA
+            };
+        },
+
         _bindEvents: function() {
             var plugin = this;
 
@@ -97,7 +119,7 @@
                 // or the target pane does not exist
                 if ($button.is('a') || $button.has('a').length > 0 || $targetMenu.length < 1) {
                     if ($targetMenu.length < 1) {
-                        console.error('Target pane with ID: ' + targetPaneId + ' does not exist!');
+                        throw new Error('Target pane with ID: ' + targetPaneId + ' does not exist!');
                     }
 
                     return;
@@ -131,6 +153,8 @@
                 return;
             }
 
+            var plugin = this;
+
             var $targetMenu = this._getTarget(targetPaneId);
 
             Velocity.animate(
@@ -138,12 +162,10 @@
                 {
                     translateX: ['-100%', 0]
                 },
-                {
+                $.extend(true, {}, this.animationDefaults, {
                     display: 'block',
-                    easing: this.options.easing,
-                    duration: this.options.duration,
-                    mobileHA: this.options.mobileHA,
                     begin: function() {
+                        plugin._trigger('slide');
                         // Setting z-index to make sure pane sliding in will always be on top
                         // of pane that's being shifted out
                         $targetMenu.css({
@@ -153,42 +175,10 @@
                     complete: function() {
                         $targetMenu.attr('aria-hidden', 'false');
                         $targetMenu.focus();
+
+                        plugin._trigger('slid');
                     }
-                }
-            );
-        },
-
-        shiftOut: function(currentPaneId, $button) {
-            if (currentPaneId === undefined) {
-                return;
-            }
-
-            var $shiftMenu = this._getTarget(currentPaneId);
-            var translateValue = this._getTranslateX($shiftMenu);
-
-            Velocity.animate(
-                $shiftMenu,
-                {
-                    translateX: [translateValue - this.options.shiftAmount + '%', translateValue + '%'],
-                    opacity: [this.options.fadeOpacityTo, 1]
-                },
-                {
-                    display: 'none',
-                    easing: this.options.easing,
-                    duration: this.options.duration,
-                    mobileHA: this.options.mobileHA,
-                    begin: function() {
-                        // Setting z-index to make sure pane shifting out will always be below
-                        // the pane that's being slided in
-                        $shiftMenu.css({
-                            zIndex: 1
-                        });
-                    },
-                    complete: function() {
-                        $shiftMenu.attr('aria-hidden', 'true');
-                        $button.attr('aria-expanded', 'true');
-                    }
-                }
+                })
             );
         },
 
@@ -204,11 +194,8 @@
                 {
                     translateX: [0, '-100%']
                 },
-                {
+                $.extend(true, {}, this.animationDefaults, {
                     display: 'none',
-                    easing: this.options.easing,
-                    duration: this.options.duration,
-                    mobileHA: this.options.mobileHA,
                     begin: function() {
                         // Setting z-index to make sure pane shifting out will always be above
                         // the pane that's being shifted back in
@@ -219,7 +206,7 @@
                     complete: function() {
                         $currentMenu.attr('aria-hidden', 'true');
                     }
-                }
+                })
             );
         },
 
@@ -228,22 +215,17 @@
                 return;
             }
 
-            var plugin = this;
-
             var $shiftMenu = this._getTarget(targetPaneId);
             var translateValue = this._getTranslateX($shiftMenu);
 
             Velocity.animate(
                 $shiftMenu,
                 {
-                    translateX: [translateValue + this.options.shiftAmount + '%', translateValue + '%'],
+                    translateX: [(translateValue + this.options.shiftAmount) + '%', translateValue + '%'],
                     opacity: [1, this.options.fadeOpacityTo]
                 },
-                {
+                $.extend(true, {}, this.animationDefaults, {
                     display: 'block',
-                    easing: this.options.easing,
-                    duration: this.options.duration,
-                    mobileHA: this.options.mobileHA,
                     begin: function() {
                         // Setting z-index to make sure pane shifting in will always be below
                         // of pane that's being slided out
@@ -256,7 +238,38 @@
                         $shiftMenu.find(selectors.NEXT_PANE + '[data-target-level="' + buttonTargetId + '"]')
                             .attr('aria-expanded', 'false');
                     }
-                }
+                })
+            );
+        },
+
+        shiftOut: function(currentPaneId, $button) {
+            if (currentPaneId === undefined) {
+                return;
+            }
+
+            var $shiftMenu = this._getTarget(currentPaneId);
+            var translateValue = this._getTranslateX($shiftMenu);
+
+            Velocity.animate(
+                $shiftMenu,
+                {
+                    translateX: [(translateValue - this.options.shiftAmount) + '%', translateValue + '%'],
+                    opacity: [this.options.fadeOpacityTo, 1]
+                },
+                $.extend(true, {}, this.animationDefaults, {
+                    display: 'none',
+                    begin: function() {
+                        // Setting z-index to make sure pane shifting out will always be below
+                        // the pane that's being slided in
+                        $shiftMenu.css({
+                            zIndex: 1
+                        });
+                    },
+                    complete: function() {
+                        $shiftMenu.attr('aria-hidden', 'true');
+                        $button.attr('aria-expanded', 'true');
+                    }
+                })
             );
         },
 

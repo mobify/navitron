@@ -18,5 +18,15 @@ define([
 
             testSandbox.setUp('sandbox', setUpComplete);
         });
+
+        it('fires the slide event when navitron slides', function(done) {
+            $element.navitron({
+                slide: function() {
+                    done();
+                }
+            });
+
+            $element.navitron('slideIn', 0);
+        });
     });
 });
