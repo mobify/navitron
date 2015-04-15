@@ -91,7 +91,7 @@
 
         _validateOptions: function() {
             if (this.options.fadeOpacityTo < 0 || this.options.fadeOpacityTo > 1) {
-                throw new Error('The fadeOpacityTo value should be a value between 0 and 1.0.');
+                throw new Error('The fadeOpacityTo value should be in the range from 0 to 1.0.');
             }
         },
 
@@ -111,9 +111,7 @@
              */
             this.$navitron.on('click', selectors.NEXT_PANE, function() {
                 var $button = $(this);
-
                 var buttonProperties = plugin._getButtonLevelData($button);
-
                 var $targetMenu = plugin._getTarget(buttonProperties.targetPaneId);
 
                 // We don't want to shift/slide anything if we're clicking on an anchor

@@ -36,7 +36,7 @@ define([
             });
 
             it('correctly defines easing', function() {
-                expect(navitron.options.easing).to.equal('swing');
+                expect(navitron.options.easing).to.equal(Navitron.DEFAULTS.easing);
                 expect(navitron.options.easing).to.be.a('string');
             });
 
@@ -57,7 +57,7 @@ define([
                     navitron = new Navitron($element, {
                         fadeOpacityTo: 2.0
                     });
-                }).to.throw('The fadeOpacityTo value should be a value between 0 and 1.0');
+                }).to.throw('The fadeOpacityTo value should be in the range from 0 to 1.0.');
             });
         });
 

@@ -91,7 +91,7 @@
 
         _validateOptions: function() {
             if (this.options.fadeOpacityTo < 0 || this.options.fadeOpacityTo > 1) {
-                throw new Error('The fadeOpacityTo value should be a value between 0 and 1.0.');
+                throw new Error('The fadeOpacityTo value should be in the range from 0 to 1.0.');
             }
         },
 
