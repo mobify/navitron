@@ -140,7 +140,7 @@
                 var $button = $(this);
 
                 // Slide out current level
-                plugin._hidePane(this.$currentPane, $button);
+                plugin._hidePane(plugin.$currentPane, $button);
             });
         },
 
@@ -172,6 +172,8 @@
                         $pane.focus();
 
                         plugin._trigger('slid');
+
+                        plugin._setCurrentPane($pane);
                     }
                 })
             );
@@ -270,9 +272,14 @@
                             .attr('aria-expanded', 'false');
 
                         plugin._trigger('shifted');
+                        plugin._setCurrentPane($targetPane);
                     }
                 })
             );
+        },
+
+        _setCurrentPane: function ($pane) {
+            this.$currentPane = $pane;
         },
 
         _getTargetPane: function(pane) {
