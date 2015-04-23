@@ -45,6 +45,8 @@
 
             this._validateOptions();
 
+            this._build();
+
             this._addAccessibility();
 
             this._setAnimationDefaults();
@@ -54,6 +56,53 @@
 
         destroy: function() {
             this.$navitron.removeData(this.name);
+        },
+
+        _build: function() {
+            var plugin = this;
+
+            var $wrapper = $('<nav />');
+            var $nestedContainer = $('<div class="navitron__nested" />');
+            var $pane = $('<div class="navitron__pane" data-level="0" />');
+            var $button = $('<button class="navitron__item navitron__next-pane" data-target-pane="0" type="button" />');
+
+            var id = this.$navitron.attr('id');
+            var classes = this.$navitron.attr('class');
+
+            // Add user markup's IDs and Classes to Navitron root
+            $wrapper.attr('id', id);
+            $wrapper.attr('class', classes);
+
+            // Remove original IDs and Classes
+            this.$navitron.removeAttr('id');
+            this.$navitron.removeAttr('class');
+
+            // Build markup
+            this.$navitron.wrap($wrapper); // Wrap everything in <nav>
+            this.$navitron.wrap($pane.clone()); // Wrap top level <ul> in a pane <div>
+            $nestedContainer.appendTo($wrapper); // Add nested contaienr that will hold all nested level panes
+
+            this.$navitron.children('li').each(function (index, item) {
+                var $item = $(item);
+                var $nestedList = $item.children('ul').remove();
+
+                if ($nestedList.length) {
+                    var text = $item.text().trim();
+
+                    // Build trigger button
+                    $item.html($button.clone().text(text));
+
+                    // Put nested levels into nested container
+                    $nestedList.wrap($pane.clone()).parent().appendTo($nestedContainer);
+
+                    console.info(text + ' ' + index);
+                } else {
+                    console.info($item.text().trim() + ' ' + index);
+                }
+            });
+
+            // Redefine Navitron to the new wrapper we created
+            this.$navitron = $wrapper;
         },
 
         /**
@@ -276,6 +325,7 @@
         },
 
         _getTargetPane: function(pane) {
+            debugger;
             return this.$navitron.find(selectors.PANE + '[data-level="' + pane + '"]');
         },
 

@@ -14,84 +14,86 @@
 <body>
     <h2>Navitron</h2>
 
-    <nav id="myNavitron" class="navitron">
-        <div class="navitron__pane" data-level="0">
-            <h3>Categories</h3>
+    <ul id="myNavitron" class="navitron">
+        <li>
+            <span>Men</span>
             <ul>
-                <li><button type="button" class="navitron__item navitron__next-pane" data-target-pane="0.1" data-current-pane="0">Men</button></li>
-                <li><button type="button" class="navitron__item navitron__next-pane" data-target-pane="0.2" data-current-pane="0">Women</button></li>
-                <li><a class="navitron__item" href="#">Anchor Link</a></li>
-                <li><a class="navitron__item" href="#">Anchor Link</a></li>
-                <li><a class="navitron__item" href="#">Anchor Link</a></li>
-                <li><a class="navitron__item" href="#">Anchor Link</a></li>
-                <li><a class="navitron__item" href="#">Anchor Link</a></li>
-                <li><a class="navitron__item" href="#">Anchor Link</a></li>
-                <li><button type="button" class="navitron__item navitron__next-pane" data-target-pane="0.3" data-current-pane="0">Gear</button></li>
+                <li>
+                    <span>Outerwear</span>
+                    <ul>
+                        <li><a href="#">Jacket</a></li>
+                        <li><a href="#">Parkas</a></li>
+                        <li><a href="#">Vests</a></li>
+                    </ul>
+                </li>
+
+                <li>
+                    <span>Shirts</span>
+                    <ul>
+                        <li><a href="#">Plain</a></li>
+                        <li><a href="#">Two Tone</a></li>
+                        <li><a href="#">Plaid</a></li>
+                    </ul>
+                </li>
+
+                <li>
+                    <span>Pants</span>
+                    <ul>
+                        <li><a href="#">Dress Pants</a></li>
+                        <li><a href="#">Jeans</a></li>
+                        <li><a href="#">Ski Pants</a></li>
+                    </ul>
+                </li>
             </ul>
-        </div>
+        </li>
 
-        <div class="navitron__nested">
-            <div class="navitron__pane" data-level="0.1">
-                <h3>Men</h3>
-                <ul>
-                    <li><button type="button" class="navitron__prev-pane" data-target-pane="0" data-current-pane="0.1">Back up one level</button></li>
-                    <li><button type="button" class="navitron__item navitron__next-pane" data-target-pane="0.1.1" data-current-pane="0.1">Outerwear</button></li>
-                    <li><button type="button" class="navitron__item navitron__next-pane" data-target-pane="0.1.2" data-current-pane="0.1">Shirts</button></li>
-                    <li><button type="button" class="navitron__item navitron__next-pane" data-target-pane="0.1.3" data-current-pane="0.1">Pants</button></li>
-                </ul>
-            </div>
+        <li>
+            <span>Women</span>
+            <ul>
+                <li>
+                    <a href="#">Tops</a>
+                </li>
 
-            <div class="navitron__pane" data-level="0.1.1">
-                <h3>Outerwear</h3>
-                <ul>
-                    <li><button type="button" class="navitron__prev-pane" data-target-pane="0.1" data-current-pane="0.1.1">Back up one level</button></li>
-                    <li><a class="navitron__item" href="#">Jacket</a></li>
-                    <li><a class="navitron__item" href="#">Parkas</a></li>
-                    <li><a class="navitron__item" href="#">Vests</a></li>
-                </ul>
-            </div>
+                <li>
+                    <a href="#">Dresses</a>
+                </li>
 
-            <div class="navitron__pane" data-level="0.1.2">
-                <h3>Shirts</h3>
-                <ul>
-                    <li><button type="button" class="navitron__prev-pane" data-target-pane="0.1" data-current-pane="0.1.2">Back up one level</button></li>
-                    <li><a class="navitron__item" href="#">Plain</a></li>
-                    <li><a class="navitron__item" href="#">Two Tone</a></li>
-                    <li><a class="navitron__item" href="#">Plaid</a></li>
-                </ul>
-            </div>
+                <li>
+                    <a href="#">Fleece</a>
+                </li>
+            </ul>
+        </li>
 
-            <div class="navitron__pane" data-level="0.1.3">
-                <h3>Pants</h3>
-                <ul>
-                    <li><button type="button" class="navitron__prev-pane" data-target-pane="0.1" data-current-pane="0.1.3">Back up one level</button></li>
-                    <li><a class="navitron__item" href="#">Dress Pants</a></li>
-                    <li><a class="navitron__item" href="#">Jeans</a></li>
-                    <li><a class="navitron__item" href="#">Ski Pants</a></li>
-                </ul>
-            </div>
+        <li><a href="#">Anchor Link</a></li>
 
-            <div class="navitron__pane" data-level="0.2">
-                <h3>Women</h3>
-                <ul>
-                    <li><button type="button" class="navitron__prev-pane" data-target-pane="0" data-current-pane="0.2">Back up one level</button></li>
-                    <li><a class="navitron__item" href="#">Tops</a></li>
-                    <li><a class="navitron__item" href="#">Dresses</a></li>
-                    <li><a class="navitron__item" href="#">Fleece</a></li>
-                </ul>
-            </div>
+        <li><a href="#">Anchor Link</a></li>
 
-            <div class="navitron__pane" data-level="0.3">
-                <h3>Gear</h3>
-                <ul>
-                    <li><button type="button" class="navitron__prev-pane" data-target-pane="0" data-current-pane="0.3">Back up one level</button></li>
-                    <li><a class="navitron__item" href="#">Lighting</a></li>
-                    <li><a class="navitron__item" href="#">Tents</a></li>
-                    <li><a class="navitron__item" href="#">Backpacks</a></li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+        <li><a href="#">Anchor Link</a></li>
+
+        <li><a href="#">Anchor Link</a></li>
+
+        <li><a href="#">Anchor Link</a></li>
+
+        <li><a href="#">Anchor Link</a></li>
+
+        <li>
+            <span>Gear</span>
+            <ul>
+                <li>
+                    <a href="#">Lighting</a>
+                </li>
+
+                <li>
+                    <a href="#">Tents</a>
+                </li>
+
+                <li>
+                    <a href="#">Backpacks</a>
+                </li>
+            </ul>
+        </li>
+    </ul>
+
 
     <script data-main="assets/js/main" src="../bower_components/requirejs/require.js"></script>
 </body>
