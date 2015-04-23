@@ -5,7 +5,7 @@ module.exports = function(grunt) {
         },
         build: {
             files: {
-                'dist/<%= pluginName %>.min.js': 'src/js/<%= pluginName %>.js'
+                'dist/navitron.min.js': 'src/js/navitron.js'
             }
         }
     };

@@ -28,7 +28,7 @@ define([
                 }
             });
 
-            $element.navitron('slideIn', 0);
+            $element.navitron('showPane', '0.1.1');
         });
 
         it('fires the slide event when navitron slides out', function(done) {
@@ -40,7 +40,7 @@ define([
                 }
             });
 
-            $element.navitron('slideOut', 0);
+            $element.navitron('_hidePane', '0.1.1');
         });
 
         it('fires the slid event when navitron is finished sliding in', function(done) {
@@ -50,7 +50,7 @@ define([
                 }
             });
 
-            $element.navitron('slideIn', 0);
+            $element.navitron('showPane', '0.1.1');
         });
 
         it('fires the slid event when navitron is finished sliding out', function(done) {
@@ -60,7 +60,7 @@ define([
                 }
             });
 
-            $element.navitron('slideOut', 0);
+            $element.navitron('_hidePane', '0.1.1');
         });
 
         it('fires the shift event when navitron shifts in', function(done) {
@@ -70,7 +70,7 @@ define([
                 }
             });
 
-            $element.navitron('shiftIn', 0);
+            $element.navitron('_showPreviousPane', '0.1.1');
         });
 
         it('fires the shift event when navitron shifts out', function(done) {
@@ -80,7 +80,7 @@ define([
                 }
             });
 
-            $element.navitron('shiftOut', 0);
+            $element.navitron('_hideCurrentPane', '0.1.1');
         });
 
         it('fires the shift event when navitron is shifted in', function(done) {
@@ -90,7 +90,7 @@ define([
                 }
             });
 
-            $element.navitron('shiftIn', 0);
+            $element.navitron('_showPreviousPane', '0.1.1');
         });
 
         it('fires the shift event when navitron is shifted out', function(done) {
@@ -100,7 +100,7 @@ define([
                 }
             });
 
-            $element.navitron('shiftOut', 0);
+            $element.navitron('_hideCurrentPane', '0.1.2');
         });
     });
 });

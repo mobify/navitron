@@ -29,6 +29,7 @@
         duration: 200,
         easing: 'swing',
         fadeOpacityTo: 0.25,
+        currentPane: '0',
         mobileHA: true,
         shift: $.noop,
         shifted: $.noop,
@@ -39,6 +40,8 @@
     Plugin.create('navitron', Navitron, {
         _init: function(element) {
             this.$navitron = $(element);
+
+            this.$currentPane = this._getTargetPane(this.options.currentPane);
 
             this._validateOptions();
 
@@ -111,24 +114,23 @@
              */
             this.$navitron.on('click', selectors.NEXT_PANE, function() {
                 var $button = $(this);
-                var buttonProperties = plugin._getButtonLevelData($button);
-                var $targetMenu = plugin._getTarget(buttonProperties.targetPaneId);
+                var levelData = $button.data();
+                var $targetPane = plugin._getTargetPane(levelData.targetPane);
 
                 // We don't want to shift/slide anything if we're clicking on an anchor
                 // or the target pane does not exist
-                if ($button.is('a') || $button.has('a').length || !$targetMenu.length) {
-                    if (!$targetMenu.length) {
-                        throw new Error('Target pane with ID: ' + buttonProperties.targetPaneId + ' does not exist!');
+                if ($button.is('a') || $button.has('a').length || !$targetPane.length) {
+                    if (!$targetPane.length) {
+                        throw new Error('Target pane with ID: ' + levelData.targetPane + ' does not exist!');
                     }
 
                     return;
                 }
 
                 // Slide in next level
-                plugin.slideIn(buttonProperties.targetPaneId);
+                plugin.showPane($targetPane);
 
-                // Shift away current Level
-                plugin.shiftOut(buttonProperties.currentPaneId, $button);
+                $button.attr('aria-expanded', 'true');
             });
 
             /**
@@ -136,26 +138,21 @@
              */
             this.$navitron.on('click', selectors.PREV_PANE, function() {
                 var $button = $(this);
-                var buttonProperties = plugin._getButtonLevelData($button);
 
                 // Slide out current level
-                plugin.slideOut(buttonProperties.currentPaneId);
-
-                // Shift in current Level
-                plugin.shiftIn(buttonProperties.targetPaneId, buttonProperties.currentPaneId);
+                plugin._hidePane(this.$currentPane, $button);
             });
         },
 
-        slideIn: function(targetPaneId) {
-            if (!targetPaneId) {
+        showPane: function($pane) {
+            if (!$pane.length) {
                 return;
             }
 
             var plugin = this;
-            var $targetMenu = this._getTarget(targetPaneId);
 
             Velocity.animate(
-                $targetMenu,
+                $pane,
                 {
                     translateX: ['-100%', 0]
                 },
@@ -166,97 +163,25 @@
 
                         // Setting z-index to make sure pane sliding in will always be on top
                         // of pane that's being shifted out
-                        $targetMenu.css({
+                        $pane.css({
                             zIndex: 2
                         });
                     },
                     complete: function() {
-                        $targetMenu.attr('aria-hidden', 'false');
-                        $targetMenu.focus();
+                        $pane.attr('aria-hidden', 'false');
+                        $pane.focus();
 
                         plugin._trigger('slid');
                     }
                 })
             );
+
+            plugin._hideCurrentPane();
         },
 
-        slideOut: function(currentPaneId) {
-            if (!currentPaneId) {
-                return;
-            }
-
+        _hideCurrentPane: function() {
             var plugin = this;
-            var $currentMenu = this._getTarget(currentPaneId);
-
-            Velocity.animate(
-                $currentMenu,
-                {
-                    translateX: [0, '-100%']
-                },
-                $.extend(true, {}, this.animationDefaults, {
-                    display: 'none',
-                    begin: function() {
-                        plugin._trigger('slide');
-
-                        // Setting z-index to make sure pane shifting out will always be above
-                        // the pane that's being shifted back in
-                        $currentMenu.css({
-                            zIndex: 2
-                        });
-                    },
-                    complete: function() {
-                        $currentMenu.attr('aria-hidden', 'true');
-
-                        plugin._trigger('slid');
-                    }
-                })
-            );
-        },
-
-        shiftIn: function(targetPaneId, buttonTargetId) {
-            if (!targetPaneId) {
-                return;
-            }
-
-            var plugin = this;
-            var $shiftMenu = this._getTarget(targetPaneId);
-            var translateValue = this._getTranslateX($shiftMenu);
-
-            Velocity.animate(
-                $shiftMenu,
-                {
-                    translateX: [(translateValue + this.options.shiftAmount) + '%', translateValue + '%'],
-                    opacity: [1, this.options.fadeOpacityTo]
-                },
-                $.extend(true, {}, this.animationDefaults, {
-                    display: 'block',
-                    begin: function() {
-                        plugin._trigger('shift');
-
-                        // Setting z-index to make sure pane shifting in will always be below
-                        // of pane that's being slided out
-                        $shiftMenu.css({
-                            zIndex: 1
-                        });
-                    },
-                    complete: function() {
-                        $shiftMenu.attr('aria-hidden', 'false');
-                        $shiftMenu.find(selectors.NEXT_PANE + '[data-target-level="' + buttonTargetId + '"]')
-                            .attr('aria-expanded', 'false');
-
-                        plugin._trigger('shifted');
-                    }
-                })
-            );
-        },
-
-        shiftOut: function(currentPaneId, $button) {
-            if (!currentPaneId) {
-                return;
-            }
-
-            var plugin = this;
-            var $shiftMenu = this._getTarget(currentPaneId);
+            var $shiftMenu = this.$currentPane;
             var translateValue = this._getTranslateX($shiftMenu);
 
             Velocity.animate(
@@ -278,7 +203,6 @@
                     },
                     complete: function() {
                         $shiftMenu.attr('aria-hidden', 'true');
-                        $button.attr('aria-expanded', 'true');
 
                         plugin._trigger('shifted');
                     }
@@ -286,19 +210,77 @@
             );
         },
 
-        _getTarget: function(levelId) {
-            return this.$navitron.find(selectors.PANE + '[data-level-id="' + levelId + '"]');
+        _hidePane: function($pane, $button) {
+            var plugin = this;
+
+            Velocity.animate(
+                $pane,
+                {
+                    translateX: [0, '-100%']
+                },
+                $.extend(true, {}, this.animationDefaults, {
+                    display: 'none',
+                    begin: function() {
+                        plugin._trigger('slide');
+
+                        // Setting z-index to make sure pane shifting out will always be above
+                        // the pane that's being shifted back in
+                        $pane.css({
+                            zIndex: 2
+                        });
+                    },
+                    complete: function() {
+                        $pane.attr('aria-hidden', 'true');
+
+                        plugin._trigger('slid');
+                    }
+                })
+            );
+
+            // Shift in current Level
+            plugin._showPreviousPane($button);
+        },
+
+        _showPreviousPane: function($button) {
+            var plugin = this;
+            var buttonProperties = $button.data();
+            var $targetPane = this._getTargetPane(buttonProperties.targetPane);
+            var translateValue = this._getTranslateX($targetPane);
+
+            Velocity.animate(
+                $targetPane,
+                {
+                    translateX: [(translateValue + this.options.shiftAmount) + '%', translateValue + '%'],
+                    opacity: [1, this.options.fadeOpacityTo]
+                },
+                $.extend(true, {}, this.animationDefaults, {
+                    display: 'block',
+                    begin: function() {
+                        plugin._trigger('shift');
+
+                        // Setting z-index to make sure pane shifting in will always be below
+                        // of pane that's being slided out
+                        $targetPane.css({
+                            zIndex: 1
+                        });
+                    },
+                    complete: function() {
+                        $targetPane.attr('aria-hidden', 'false');
+                        $targetPane.find(selectors.NEXT_PANE + '[data-target-pane="' + buttonProperties.currentPane + '"]')
+                            .attr('aria-expanded', 'false');
+
+                        plugin._trigger('shifted');
+                    }
+                })
+            );
+        },
+
+        _getTargetPane: function(pane) {
+            return this.$navitron.find(selectors.PANE + '[data-level="' + pane + '"]');
         },
 
         _getTranslateX: function($element) {
             return parseFloat(Velocity.CSS.getPropertyValue($element[0], 'translateX'));
-        },
-
-        _getButtonLevelData: function($button) {
-            return {
-                targetPaneId: $button.data('target-level'),
-                currentPaneId: $button.data('current-level')
-            };
         }
     });
 
