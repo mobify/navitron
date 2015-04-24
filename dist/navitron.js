@@ -40,6 +40,8 @@
 
             this._validateOptions();
 
+            this._labelTree();
+
             this._build();
 
             this.$currentPane = this._getTargetPane(this.options.currentPane);
@@ -53,6 +55,32 @@
 
         destroy: function() {
             this.$navitron.removeData(this.name);
+        },
+
+        _labelTree: function() {
+            var selector = '> li > ul';
+            this.$original.attr('data-level', '0');
+
+            while (true) {
+                var $children = this.$original.find(selector);
+
+                if ($children.length) {
+
+                    $children.each(function (index, item) {
+                        var $child = $(item);
+                        // Grabbing ul parent
+                        var $parent = $child.parents('ul').first();
+
+                        if ($parent.length) {
+                            $child.attr('data-level', $parent.attr('data-level') + '.' + index);
+                        }
+                    }); // jshint ignore:line
+
+                    selector += selector;
+                } else {
+                    break;
+                }
+            }
         },
 
         _build: function() {

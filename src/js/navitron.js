@@ -59,10 +59,10 @@
 
         _labelTree: function() {
             var selector = '> li > ul';
-            this.$navitron.attr('data-level', '0');
+            this.$original.attr('data-level', '0');
 
             while (true) {
-                var $children = this.$navitron.find(selector);
+                var $children = this.$original.find(selector);
 
                 if ($children.length) {
 
@@ -74,7 +74,7 @@
                         if ($parent.length) {
                             $child.attr('data-level', $parent.attr('data-level') + '.' + index);
                         }
-                    });
+                    }); // jshint ignore:line
 
                     selector += selector;
                 } else {
