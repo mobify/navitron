@@ -12,7 +12,7 @@ define([
             var setUpComplete = function(iFrame$, dependencies) {
                 $ = iFrame$;
                 Navitron = $.fn.navitron.Constructor;
-                $element = $(fixture).parents('.navitron').first();
+                $element = $(fixture);
                 $nestedPane = $element.find('.navitron__nested .navitron__pane').first();
 
                 done();
