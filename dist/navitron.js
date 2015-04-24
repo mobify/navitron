@@ -60,10 +60,11 @@
 
         _labelTree: function() {
             var selector = '> li > ul';
-            this.$original.attr('data-level', '0');
+            var $topLevel = this.$original.children('ul');
+            $topLevel.attr('data-level', '0');
 
             while (true) {
-                var $children = this.$original.find(selector);
+                var $children = $topLevel.find(selector);
 
                 if ($children.length) {
 
@@ -87,15 +88,12 @@
         _build: function() {
             var plugin = this;
 
-            var $navitron = $('<nav />');
+            var $navitron = this.$original.addClass('navitron');
             var $nestedContainer = $('<div />').addClass('navitron__nested');
             var $pane = $('<div />').addClass('navitron__pane');
             var $button = $('<button type="button" />').addClass('navitron__item');
-
-            var id = this.$original.attr('id');
-            var classes = this.$original.attr('class');
-
-            var $listItems = this.$original.children('li');
+            var $topLevelList = this.$original.children('ul');
+            var $listItems = $topLevelList.children('li');
 
             var _buildNestedLevels = function ($listItems) {
 
@@ -107,6 +105,7 @@
                     if ($nestedList.length) {
                         // Get level data
                         var level = $nestedList.data('level');
+                        // var level = '';
                         var targetLevel = plugin._getParentLevel(level);
 
                         // Clean up markup
@@ -146,18 +145,12 @@
                 });
             };
 
-            // Add user markup's IDs and Classes to Navitron root
-            $navitron.attr('id', id);
-            $navitron.attr('class', classes);
-
-            // Remove original IDs and Classes
-            this.$original.removeAttr('id');
-            this.$original.removeAttr('class');
-            this.$original.removeAttr('data-level');
+            // Get top level data
+            var topLevel = $topLevelList.attr('data-level');
+            $topLevelList.removeAttr('data-level'); // Remove the data-level set by
 
             // Build markup
-            this.$original.wrap($navitron); // Wrap everything in <nav>
-            this.$original.wrap($pane.clone().attr('data-level', 0)); // Wrap top level <ul> in a pane <div>
+            this.$original.children('ul').wrap($pane.clone().attr('data-level', topLevel)); // Wrap top level <ul> in a pane <div>
             $nestedContainer.appendTo($navitron); // Add nested container that will hold all nested level panes
             _buildNestedLevels($listItems); // Build nested levels
 
