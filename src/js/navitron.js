@@ -31,17 +31,17 @@
         fadeOpacityTo: 0.25,
         currentPane: '0',
         mobileHA: true,
-        shift: $.noop,
-        shifted: $.noop,
-        slide: $.noop,
-        slid: $.noop
+        show: $.noop
     };
 
     Plugin.create('navitron', Navitron, {
         _init: function(element) {
-            this.$navitron = $(element);
+
+            this.$original = $(element);
 
             this._validateOptions();
+
+            this._labelTree();
 
             this._build();
 
@@ -58,18 +58,44 @@
             this.$navitron.removeData(this.name);
         },
 
+        _labelTree: function() {
+            var selector = '> li > ul';
+            this.$original.attr('data-level', '0');
+
+            while (true) {
+                var $children = this.$original.find(selector);
+
+                if ($children.length) {
+
+                    $children.each(function (index, item) {
+                        var $child = $(item);
+                        // Grabbing ul parent
+                        var $parent = $child.parents('ul').first();
+
+                        if ($parent.length) {
+                            $child.attr('data-level', $parent.attr('data-level') + '.' + index);
+                        }
+                    }); // jshint ignore:line
+
+                    selector += selector;
+                } else {
+                    break;
+                }
+            }
+        },
+
         _build: function() {
             var plugin = this;
 
-            var $wrapper = $('<nav />');
+            var $navitron = $('<nav />');
             var $nestedContainer = $('<div />').addClass('navitron__nested');
             var $pane = $('<div />').addClass('navitron__pane');
             var $button = $('<button type="button" />').addClass('navitron__item');
 
-            var id = this.$navitron.attr('id');
-            var classes = this.$navitron.attr('class');
+            var id = this.$original.attr('id');
+            var classes = this.$original.attr('class');
 
-            var $listItems = this.$navitron.children('li');
+            var $listItems = this.$original.children('li');
 
             var _buildNestedLevels = function ($listItems) {
 
@@ -121,22 +147,22 @@
             };
 
             // Add user markup's IDs and Classes to Navitron root
-            $wrapper.attr('id', id);
-            $wrapper.attr('class', classes);
+            $navitron.attr('id', id);
+            $navitron.attr('class', classes);
 
             // Remove original IDs and Classes
-            this.$navitron.removeAttr('id');
-            this.$navitron.removeAttr('class');
-            this.$navitron.removeAttr('data-level');
+            this.$original.removeAttr('id');
+            this.$original.removeAttr('class');
+            this.$original.removeAttr('data-level');
 
             // Build markup
-            this.$navitron.wrap($wrapper); // Wrap everything in <nav>
-            this.$navitron.wrap($pane.clone().attr('data-level', 0)); // Wrap top level <ul> in a pane <div>
-            $nestedContainer.appendTo($wrapper); // Add nested container that will hold all nested level panes
+            this.$original.wrap($navitron); // Wrap everything in <nav>
+            this.$original.wrap($pane.clone().attr('data-level', 0)); // Wrap top level <ul> in a pane <div>
+            $nestedContainer.appendTo($navitron); // Add nested container that will hold all nested level panes
             _buildNestedLevels($listItems); // Build nested levels
 
             // Redefine Navitron to the new wrapper we created
-            this.$navitron = $wrapper;
+            this.$navitron = $navitron;
         },
 
         _getParentLevel: function (level) {
@@ -232,13 +258,13 @@
                 var $button = $(this);
 
                 // Slide out current level
-                plugin._hidePane(this.$currentPane, $button);
+                plugin._hidePane(plugin.$currentPane, $button);
             });
         },
 
         showPane: function($pane) {
             if (!$pane.length) {
-                return;
+                throw new Error('The showPane method requires a pane element to show');
             }
 
             var plugin = this;
@@ -251,7 +277,7 @@
                 $.extend(true, {}, this.animationDefaults, {
                     display: 'block',
                     begin: function() {
-                        plugin._trigger('slide');
+                        plugin._trigger('show');
 
                         // Setting z-index to make sure pane sliding in will always be on top
                         // of pane that's being shifted out
@@ -263,7 +289,9 @@
                         $pane.attr('aria-hidden', 'false');
                         $pane.focus();
 
-                        plugin._trigger('slid');
+                        plugin._trigger('shown');
+
+                        plugin._setCurrentPane($pane);
                     }
                 })
             );
@@ -272,7 +300,6 @@
         },
 
         _hideCurrentPane: function() {
-            var plugin = this;
             var $shiftMenu = this.$currentPane;
             var translateValue = this._getTranslateX($shiftMenu);
 
@@ -285,8 +312,6 @@
                 $.extend(true, {}, this.animationDefaults, {
                     display: 'none',
                     begin: function() {
-                        plugin._trigger('shift');
-
                         // Setting z-index to make sure pane shifting out will always be below
                         // the pane that's being slided in
                         $shiftMenu.css({
@@ -295,8 +320,6 @@
                     },
                     complete: function() {
                         $shiftMenu.attr('aria-hidden', 'true');
-
-                        plugin._trigger('shifted');
                     }
                 })
             );
@@ -313,8 +336,6 @@
                 $.extend(true, {}, this.animationDefaults, {
                     display: 'none',
                     begin: function() {
-                        plugin._trigger('slide');
-
                         // Setting z-index to make sure pane shifting out will always be above
                         // the pane that's being shifted back in
                         $pane.css({
@@ -323,8 +344,6 @@
                     },
                     complete: function() {
                         $pane.attr('aria-hidden', 'true');
-
-                        plugin._trigger('slid');
                     }
                 })
             );
@@ -348,8 +367,6 @@
                 $.extend(true, {}, this.animationDefaults, {
                     display: 'block',
                     begin: function() {
-                        plugin._trigger('shift');
-
                         // Setting z-index to make sure pane shifting in will always be below
                         // of pane that's being slided out
                         $targetPane.css({
@@ -357,14 +374,19 @@
                         });
                     },
                     complete: function() {
-                        $targetPane.attr('aria-hidden', 'false');
-                        $targetPane.find(selectors.NEXT_PANE + '[data-target-pane="' + buttonProperties.currentPane + '"]')
+                        $targetPane
+                            .attr('aria-hidden', 'false')
+                            .find(selectors.NEXT_PANE + '[data-target-pane="' + buttonProperties.currentPane + '"]')
                             .attr('aria-expanded', 'false');
 
-                        plugin._trigger('shifted');
+                        plugin._setCurrentPane($targetPane);
                     }
                 })
             );
+        },
+
+        _setCurrentPane: function ($pane) {
+            this.$currentPane = $pane;
         },
 
         _getTargetPane: function(pane) {
