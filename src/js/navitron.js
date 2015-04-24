@@ -41,11 +41,11 @@
         _init: function(element) {
             this.$navitron = $(element);
 
-            this.$currentPane = this._getTargetPane(this.options.currentPane);
-
             this._validateOptions();
 
             this._build();
+
+            this.$currentPane = this._getTargetPane(this.options.currentPane);
 
             this._addAccessibility();
 
@@ -62,12 +62,63 @@
             var plugin = this;
 
             var $wrapper = $('<nav />');
-            var $nestedContainer = $('<div class="navitron__nested" />');
-            var $pane = $('<div class="navitron__pane" data-level="0" />');
-            var $button = $('<button class="navitron__item navitron__next-pane" data-target-pane="0" type="button" />');
+            var $nestedContainer = $('<div />').addClass('navitron__nested');
+            var $pane = $('<div />').addClass('navitron__pane');
+            var $button = $('<button type="button" />').addClass('navitron__item');
 
             var id = this.$navitron.attr('id');
             var classes = this.$navitron.attr('class');
+
+            var $listItems = this.$navitron.children('li');
+
+            var _buildNestedLevels = function ($listItems) {
+
+                $listItems.each(function (index, item) {
+                    var $item = $(item);
+                    var $nestedList = $item.children('ul').remove();
+
+                    // If there's nested <ul> run _buildNestedLevels function again
+                    if ($nestedList.length) {
+                        // Get level data
+                        var level = $nestedList.data('level');
+                        var targetLevel = plugin._getParentLevel(level);
+
+                        // Clean up markup
+                        $nestedList.removeAttr('data-level');
+
+                        var $prevButton = $button.clone()
+                                .text('Back')
+                                .addClass('navitron__prev-pane')
+                                .attr('data-target-pane', targetLevel);
+
+                        $prevButton.wrap('<li />').parent().prependTo($nestedList);
+
+                        // Build next level button
+                        var text = $item.text().trim();
+
+                        $item.html(
+                            $button.clone()
+                                .text(text)
+                                .attr('data-target-pane', level)
+                                .addClass('navitron__next-pane')
+                        );
+
+                        // Put nested levels into nested container
+                        $nestedList
+                            .wrap($pane.clone())
+                            .parent()
+                            .attr('data-level', level)
+                            .appendTo($nestedContainer);
+
+                        // Run again for nested level
+                        var $listItems = $nestedList.children('li');
+
+                        if ($listItems.length) {
+                            _buildNestedLevels($listItems);
+                        }
+                    }
+                });
+            };
 
             // Add user markup's IDs and Classes to Navitron root
             $wrapper.attr('id', id);
@@ -76,33 +127,25 @@
             // Remove original IDs and Classes
             this.$navitron.removeAttr('id');
             this.$navitron.removeAttr('class');
+            this.$navitron.removeAttr('data-level');
 
             // Build markup
             this.$navitron.wrap($wrapper); // Wrap everything in <nav>
-            this.$navitron.wrap($pane.clone()); // Wrap top level <ul> in a pane <div>
-            $nestedContainer.appendTo($wrapper); // Add nested contaienr that will hold all nested level panes
-
-            this.$navitron.children('li').each(function (index, item) {
-                var $item = $(item);
-                var $nestedList = $item.children('ul').remove();
-
-                if ($nestedList.length) {
-                    var text = $item.text().trim();
-
-                    // Build trigger button
-                    $item.html($button.clone().text(text));
-
-                    // Put nested levels into nested container
-                    $nestedList.wrap($pane.clone()).parent().appendTo($nestedContainer);
-
-                    console.info(text + ' ' + index);
-                } else {
-                    console.info($item.text().trim() + ' ' + index);
-                }
-            });
+            this.$navitron.wrap($pane.clone().attr('data-level', 0)); // Wrap top level <ul> in a pane <div>
+            $nestedContainer.appendTo($wrapper); // Add nested container that will hold all nested level panes
+            _buildNestedLevels($listItems); // Build nested levels
 
             // Redefine Navitron to the new wrapper we created
             this.$navitron = $wrapper;
+        },
+
+        _getParentLevel: function (level) {
+            var levelParts = level.split('.');
+
+            // Pop Off the current id
+            levelParts.pop();
+
+            return levelParts.join('.');
         },
 
         /**
@@ -118,7 +161,7 @@
 
             this.$navitron.find(selectors.NESTED_PANE).each(function(idx, el) {
                 var $el = $(el);
-                var levelId = $el.data('level-id');
+                var levelId = $el.data('level');
 
                 // Prefixing ID with 'Navitron_' to ensure we don't set a duplicate client ID accidentally
                 // TODO: What if the navitron pane has an ID already? How do we handle that?
@@ -133,7 +176,7 @@
 
             this.$navitron.find(selectors.NEXT_PANE).each(function(idx, el) {
                 var $el = $(el);
-                var targetId = $el.data('target-level');
+                var targetId = $el.data('target-pane');
 
                 $el
                     .attr('aria-expanded', 'false')
@@ -325,7 +368,6 @@
         },
 
         _getTargetPane: function(pane) {
-            debugger;
             return this.$navitron.find(selectors.PANE + '[data-level="' + pane + '"]');
         },
 
