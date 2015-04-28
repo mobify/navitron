@@ -61,6 +61,7 @@
         _labelTree: function() {
             var selector = '> li > ul';
             var $topLevel = this.$original.children('ul');
+
             $topLevel.attr('data-level', '0');
 
             while (true) {
@@ -69,6 +70,7 @@
                 if ($children.length) {
 
                     $children.each(function (index, item) {
+
                         var $child = $(item);
                         // Grabbing ul parent
                         var $parent = $child.parents('ul').first();
@@ -147,7 +149,7 @@
 
             // Get top level data
             var topLevel = $topLevelList.attr('data-level');
-            $topLevelList.removeAttr('data-level'); // Remove the data-level set by
+            $topLevelList.removeAttr('data-level'); // Remove the data-level set by label tree function
 
             // Build markup
             this.$original.children('ul').wrap($pane.clone().attr('data-level', topLevel)); // Wrap top level <ul> in a pane <div>

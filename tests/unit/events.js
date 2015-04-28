@@ -32,5 +32,17 @@ define([
 
             $element.navitron('showPane', $nestedPane);
         });
+
+        it('fires the shown event after navitron pane is slid in', function(done) {
+            console.info($element);
+
+            $element.navitron({
+                shown: function() {
+                    done();
+                }
+            });
+
+            $element.navitron('showPane', $nestedPane);
+        });
     });
 });
