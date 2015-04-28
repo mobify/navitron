@@ -261,61 +261,52 @@
             }
 
             var plugin = this;
-
-            Velocity.animate(
-                $pane,
-                {
-                    translateX: ['-100%', 0]
-                },
-                $.extend(true, {}, this.animationDefaults, {
-                    display: 'block',
-                    begin: function() {
-                        plugin._trigger('show');
-
-                        // Setting z-index to make sure pane sliding in will always be on top
-                        // of pane that's being shifted out
-                        $pane.css({
-                            zIndex: 2
-                        });
-                    },
-                    complete: function() {
-                        $pane.attr('aria-hidden', 'false');
-                        $pane.focus();
-
-                        plugin._trigger('shown');
-
-                        plugin._setCurrentPane($pane);
-                    }
-                })
-            );
-
-            plugin._hideCurrentPane();
-        },
-
-        _hideCurrentPane: function() {
             var $shiftMenu = this.$currentPane;
             var translateValue = this._getTranslateX($shiftMenu);
 
-            Velocity.animate(
-                $shiftMenu,
-                {
-                    translateX: [(translateValue - this.options.shiftAmount) + '%', translateValue + '%'],
-                    opacity: [this.options.fadeOpacityTo, 1]
-                },
-                $.extend(true, {}, this.animationDefaults, {
-                    display: 'none',
-                    begin: function() {
-                        // Setting z-index to make sure pane shifting out will always be below
-                        // the pane that's being slided in
-                        $shiftMenu.css({
-                            zIndex: 1
-                        });
+            Velocity
+                .animate(
+                    $pane,
+                    { translateX: ['-100%', 0] },
+                    $.extend(true, {}, this.animationDefaults, {
+                        display: 'block',
+                        begin: function() {
+                            plugin._trigger('show');
+
+                            // Setting z-index to make sure pane sliding in will always be on top
+                            // of pane that's being shifted out
+                            $pane.css({ zIndex: 2 });
+                        },
+                        complete: function() {
+                            $pane.attr('aria-hidden', 'false').focus();
+
+                            plugin._trigger('shown');
+                        }
+                    })
+                );
+
+            Velocity
+                .animate(
+                    $shiftMenu,
+                    {
+                        translateX: [(translateValue - this.options.shiftAmount) + '%', translateValue + '%'],
+                        opacity: [this.options.fadeOpacityTo, 1]
                     },
-                    complete: function() {
-                        $shiftMenu.attr('aria-hidden', 'true');
-                    }
-                })
-            );
+                    $.extend(true, {}, this.animationDefaults, {
+                        display: 'none',
+                        begin: function() {
+                            // Setting z-index to make sure pane shifting out will always be below
+                            // the pane that's being slided in
+                            $shiftMenu.css({ zIndex: 1 });
+                        },
+                        complete: function() {
+                            $shiftMenu.attr('aria-hidden', 'true');
+
+                            plugin._setCurrentPane($pane);
+                        }
+                    }),
+                    {queue: false}
+                );
         },
 
         _hidePane: function($pane, $button) {
