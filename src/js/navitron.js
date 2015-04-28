@@ -156,6 +156,8 @@
 
             // Redefine Navitron to the new wrapper we created
             this.$navitron = $navitron;
+
+            this.$navitron.removeAttr('hidden');
         },
 
         _getParentLevel: function (level) {

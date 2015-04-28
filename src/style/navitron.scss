@@ -83,3 +83,14 @@
 
     -webkit-overflow-scrolling: touch;
 }
+
+// Navitron: Hidden
+// -------------
+//
+// We polyfill the hidden attribute here to ensure it hides all content when
+// applied. Navitron uses [hidden] to hide content from FOUT before the plugin is
+// initialized.
+
+[hidden] {
+    display: none !important;
+}
