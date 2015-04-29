@@ -41,13 +41,9 @@
 
             this._validateOptions();
 
-            this._labelTree();
-
             this._build();
 
             this.$currentPane = this._getTargetPane(this.options.currentPane);
-
-            this._addAccessibility();
 
             this._setAnimationDefaults();
 
@@ -58,37 +54,10 @@
             this.$navitron.removeData(this.name);
         },
 
-        _labelTree: function() {
-            var selector = '> li > ul';
-            var $topLevel = this.$original.children('ul');
-
-            $topLevel.attr('data-level', '0');
-
-            while (true) {
-                var $children = $topLevel.find(selector);
-
-                if ($children.length) {
-
-                    $children.each(function (index, item) {
-
-                        var $child = $(item);
-                        // Grabbing ul parent
-                        var $parent = $child.parents('ul').first();
-
-                        if ($parent.length) {
-                            $child.attr('data-level', $parent.attr('data-level') + '.' + index);
-                        }
-                    }); // jshint ignore:line
-
-                    selector += selector;
-                } else {
-                    break;
-                }
-            }
-        },
-
         _build: function() {
             var plugin = this;
+
+            plugin._setLevelData();
 
             var $navitron = this.$original.addClass('navitron');
             var $nestedContainer = $('<div />').addClass('navitron__nested');
@@ -159,6 +128,10 @@
             // Redefine Navitron to the new wrapper we created
             this.$navitron = $navitron;
 
+            // Set ARIA accessibility attributes
+            this._addAccessibility();
+
+            // Reveal navitron now that it has finished building
             this.$navitron.removeAttr('hidden');
         },
 
@@ -169,6 +142,34 @@
             levelParts.pop();
 
             return levelParts.join('.');
+        },
+
+        _setLevelData: function() {
+            var selector = '> li > ul ';
+            var $topLevel = this.$original.children('ul');
+
+            $topLevel.attr('data-level', '0');
+
+            while (true) {
+                var $children = $topLevel.find(selector);
+
+                if ($children.length) {
+                    $children.each(function (index, item) {
+
+                        var $child = $(item);
+                        // Grabbing ul parent
+                        var $parent = $child.parents('ul').first();
+
+                        if ($parent.length) {
+                            $child.attr('data-level', $parent.attr('data-level') + '.' + index);
+                        }
+                    }); // jshint ignore:line
+
+                    selector += '> li > ul';
+                } else {
+                    break;
+                }
+            }
         },
 
         /**
