@@ -80,7 +80,6 @@
                     if ($nestedList.length) {
                         // Get level data
                         var level = $nestedList.data('level');
-                        // var level = '';
                         var targetLevel = plugin._getParentLevel(level);
 
                         // Clean up markup
@@ -89,7 +88,8 @@
                         var $prevButton = $button.clone()
                                 .text('Back')
                                 .addClass('navitron__prev-pane')
-                                .attr('data-target-pane', targetLevel);
+                                .attr('data-target-pane', targetLevel)
+                                .attr('data-current-pane', level);
 
                         $prevButton.wrap('<li />').parent().prependTo($nestedList);
 
@@ -250,6 +250,7 @@
                 // Slide in next level
                 plugin.showPane($targetPane);
 
+                // ARIA Accessibility
                 $button.attr('aria-expanded', 'true');
             });
 
@@ -295,6 +296,7 @@
                             plugin.$navitron.addClass(cssClasses.ANIMATING);
                         },
                         complete: function() {
+                            // TODO: Screenreaders isn't focusing on the current pane correctly at the moment
                             $pane.attr('aria-hidden', 'false').focus();
 
                             plugin._trigger('shown');
