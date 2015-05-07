@@ -18,6 +18,10 @@
         PREV_PANE: '.navitron__prev-pane'
     };
 
+    var cssClasses = {
+        ANIMATING: 'navitron--is-animating'
+    };
+
     function Navitron(element, options) {
         Navitron.__super__.call(this, element, options, Navitron.DEFAULTS);
     }
@@ -265,6 +269,11 @@
                 throw new Error('The showPane method requires a pane element to show');
             }
 
+            // CSOPS-1332: This is to enforce only one pane to animate at a time
+            if (this.$navitron.hasClass(cssClasses.ANIMATING)) {
+                return;
+            }
+
             var plugin = this;
             var $shiftMenu = this.$currentPane;
             var translateValue = this._getTranslateX($shiftMenu);
@@ -281,6 +290,9 @@
                             // Setting z-index to make sure pane sliding in will always be on top
                             // of pane that's being shifted out
                             $pane.css({ zIndex: 2 });
+
+                            // CSOPS-1332: This is to enforce only one pane to animate at a time
+                            plugin.$navitron.addClass(cssClasses.ANIMATING);
                         },
                         complete: function() {
                             $pane.attr('aria-hidden', 'false').focus();
@@ -308,6 +320,9 @@
                             $shiftMenu.attr('aria-hidden', 'true');
 
                             plugin._setCurrentPane($pane);
+
+                            // CSOPS-1332: This is to enforce only one pane to animate at a time
+                            plugin.$navitron.removeClass(cssClasses.ANIMATING);
                         }
                     }),
                     {queue: false}
@@ -316,6 +331,11 @@
 
         _hidePane: function($pane, $button) {
             var plugin = this;
+
+            // CSOPS-1332: This is to enforce only one pane to animate at a time
+            if (this.$navitron.hasClass(cssClasses.ANIMATING)) {
+                return;
+            }
 
             Velocity.animate(
                 $pane,
@@ -330,6 +350,9 @@
                         $pane.css({
                             zIndex: 2
                         });
+
+                        // CSOPS-1332: This is to enforce only one pane to animate at a time
+                        plugin.$navitron.addClass(cssClasses.ANIMATING);
                     },
                     complete: function() {
                         $pane.attr('aria-hidden', 'true');
@@ -369,6 +392,9 @@
                             .attr('aria-expanded', 'false');
 
                         plugin._setCurrentPane($targetPane);
+
+                        // CSOPS-1332: This is to enforce only one pane to animate at a time
+                        plugin.$navitron.removeClass(cssClasses.ANIMATING);
                     }
                 })
             );
