@@ -36,9 +36,6 @@
 //    [Note] Must keep this as 'display: none' otherwise you can
 //    crash the browser translating too many divs at once. This
 //    also helps with Pinny's opening/closing animation.
-//
-// 2. Used for unique sliding effects. For example: Flipping
-//    the next pane over like a page.
 
 .navitron__nested {
     position: absolute;
@@ -49,8 +46,6 @@
     z-index: 10;
 
     transform: translate3d(100%, 0, 0);
-
-    perspective: 1000px; // 2
 
     .navitron__pane {
         display: none; // 1
@@ -67,6 +62,7 @@
 // Notes:
 //
 // 1. Avoid content bleed through.
+// 2. [CSOPS-1371] Fix repaint issues on Android 4.1
 
 .navitron__pane {
     position: absolute;
@@ -75,13 +71,17 @@
     right: 0;
     bottom: 0;
 
+    overflow-x: hidden;
     overflow-y: auto;
+    width: 100%;
+    height: 100%;
 
     background: white; // 1
 
     transform: translate3d(0, 0, 0);
 
     -webkit-overflow-scrolling: touch;
+    -webkit-backface-visibility: hidden; // 2
 }
 
 // Navitron: Hidden
