@@ -51,13 +51,6 @@ a {
     background: #4d4d4d;
 }
 
-/* Legacy Android have problems rendering position absolute + overflow + box-shadow */
-
-/*.navitron__pane {
-    -webkit-box-shadow: 0 0 20px black;
-    box-shadow: 0 0 20px black;
-}*/
-
 .navitron__prev-pane::before {
     content: '';
 
