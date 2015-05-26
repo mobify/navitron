@@ -182,9 +182,9 @@ $('#myNavitron').navitron({
 
 default: `0.25`
 
-A range from 0 to 1. Sets how much the pane fades away when being animated out of view.
+A range from 0 to 1. Sets the opacity value the pane will fade to when being animated in/out of view.
 
-**If you don't want any fading animation, set `fadeOpacityTo` to 1
+**If you don't want any fading animation, set `fadeOpacityTo` to 1**
 
 ```js
 $('#myNavitron').navitron({
