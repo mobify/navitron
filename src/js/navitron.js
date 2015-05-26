@@ -34,8 +34,8 @@
         easing: 'swing',
         fadeOpacityTo: 0.25,
         currentPane: '0',
-        mobileHA: true,
-        show: $.noop
+        show: $.noop,
+        shown: $.noop
     };
 
     Plugin.create('navitron', Navitron, {
@@ -222,7 +222,7 @@
             this.animationDefaults = {
                 easing: this.options.easing,
                 duration: this.options.duration,
-                mobileHA: this.options.mobileHA
+                mobileHA: true
             };
         },
 
@@ -286,7 +286,7 @@
                     $.extend(true, {}, this.animationDefaults, {
                         display: 'block',
                         begin: function() {
-                            plugin._trigger('show');
+                            plugin._trigger('show', { pane: $pane });
 
                             // Setting z-index to make sure pane sliding in will always be on top
                             // of pane that's being shifted out
@@ -299,7 +299,7 @@
                             // TODO: Screenreaders isn't focusing on the current pane correctly at the moment
                             $pane.attr('aria-hidden', 'false').focus();
 
-                            plugin._trigger('shown');
+                            plugin._trigger('shown', { pane: $pane });
                         }
                     })
                 );
@@ -394,9 +394,11 @@
                             .attr('aria-expanded', 'false');
 
                         plugin._setCurrentPane($targetPane);
+                        plugin._trigger('shown', { pane: $targetPane });
 
                         // CSOPS-1332: This is to enforce only one pane to animate at a time
                         plugin.$navitron.removeClass(cssClasses.ANIMATING);
+
                     }
                 })
             );

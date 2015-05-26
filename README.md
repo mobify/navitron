@@ -69,7 +69,7 @@ For accessibility and functional purposes, Navitron will wrap all of your body c
 <link rel="stylesheet" href="navitron-style.min.css">
 
 <!-- Include the markup -->
-<nav id="yourNavitron" hidden>
+<nav id="myNavitron" hidden>
     <ul>
         <li>
             Level 1 Item 1
@@ -103,8 +103,178 @@ For accessibility and functional purposes, Navitron will wrap all of your body c
 <script src="navitron.min.js"></script>
 
 <!-- Construct navitron -->
-<script>$('#yourNavitron').navitron()</script>
+<script>$('#myNavitron').navitron()</script>
 ```
+
+## Initializing the plugin
+
+### navitron()
+
+Initializes the navitron.
+
+```js
+$('#myNavitron').navitron();
+```
+
+### navitron(options)
+
+Initialize with options.
+
+```js
+$('#myNavitron').navitron({
+    shiftAmount: 20,
+    duration: 200,
+    easing: 'swing',
+    fadeOpacityTo: 0.25,
+    currentPane: '0',
+    show: noop,
+    shown: noop
+});
+```
+
+#### Options
+
+##### shiftAmount
+
+default: `20`
+
+Specifies how much the current pane shifts away.
+TODO: Add a gif for explanation
+
+```js
+$('#myNavitron').navitron({
+    shiftAmount: 40
+});
+```
+
+##### duration
+
+default: `200`
+
+Sets the duration for the animation.
+
+```js
+$('#myNavitron').navitron({
+    duration: 1000
+});
+```
+
+##### easing
+
+default: `swing`
+
+Sets the easing for the animation. Navitron takes all of the same easing properties that [Velocity.js](http://julian.com/research/velocity) accepts.
+
+> * [jQuery UI's easings](http://easings.net/) and CSS3's easings ("ease", "ease-in", "ease-out", and "ease-in-out"), which are pre-packaged into Velocity. A bonus "spring" easing (sampled in the CSS Support pane) is also included.
+* CSS3's bezier curves: Pass in a four-item array of bezier points. (Refer to [Cubic-Bezier.com](http://cubic-bezier.com/) for crafing custom bezier curves.)
+* Spring physics: Pass a two-item array in the form of [ tension, friction ]. A higher tension (default: 600) increases total speed and bounciness. A lower friction (default: 20) increases ending vibration speed.
+* Step easing: Pass a one-item array in the form of [ steps ]. The animation will jump toward its end values using the specified number of steps.
+
+For more information, check out [Velocity's docs on easing](http://julian.com/research/velocity/#easing).
+
+```js
+$('#myNavitron').navitron({
+    easing: 'ease-in-out'
+});
+```
+
+##### fadeOpacityTo
+
+default: `0.25`
+
+A range from 0 to 1. Sets how much the pane fades away when being animated out of view.
+
+**If you don't want any fading animation, set `fadeOpacityTo` to 1
+
+```js
+$('#myNavitron').navitron({
+    fadeOpacityTo: 0.5
+});
+```
+
+##### show
+
+default: `function(e, ui) {}`
+
+Triggered every time Navitron is starting to animate a pane.
+
+**Parameters**
+
+| Parameter name | Description |
+|----------------|-------------|
+| **e** | An Event object passed to the callback |
+| **ui** | An object containing any associated data for use inside the callback |
+
+```js
+$('#myNavitron').navitron({
+    show: function(e, ui) {
+        // ui.pane contains the pane animating in
+    }
+});
+```
+
+##### shown
+
+default: `function(e, ui) {}`
+
+Triggered every time Navitron has finished animating a pane.
+
+**Parameters**
+
+| Parameter name | Description |
+|----------------|-------------|
+| **e** | An Event object passed to the callback |
+| **ui** | An object containing any associated data for use inside the callback |
+
+```js
+$('#myNavitron').navitron({
+    shown: function(e, ui) {
+        // ui.pane contains the pane that is shown
+    }
+});
+```
+
+## Methods
+
+### Show Pane
+
+Show the selected pane by element reference
+
+```js
+$('#myNavitron').navitron('showPane', $targetPane);
+```
+
+## Browser Compatibility
+
+| Browser           | Version | Support                      |
+|-------------------|---------|------------------------------|
+| Mobile Safari     | 5.1.x   | ?????????                    |
+| Mobile Safari     | 6.0+    | Supported.                   |
+| Chrome (Android)  | 38.0+   | Supported.                   |
+| Android Browser   | 4.0+    | Partial support.             |
+| IE for Win Phone  | 8.0+    | ?????????                    |
+| Firefox (Android) | 27.0+   | Supported.                   |
+
+
+## Known Issues
+
+Currently for AOSP browsers 4.0.x - 4.1.x, the panes do not animate smoothly when CSS box-shadow is applied to them and have minor rendering artifacts where some of the content is cut off. It is recommended to disable box-shadows for these browsers.
+
+## Working with Navitron locally
+
+### Requirements
+
+* [Node.js 0.10.x/npm](http://nodejs.org/download/)
+* [Grunt](http://gruntjs.com/)
+  * Install with `npm install -g grunt-cli`
+* [Bower](http://bower.io/)
+  * Install with `npm install -g bower`
+
+
+### Steps
+1. `npm install`
+1. `bower install`
+1. `grunt serve`
 
 
 ### Grunt Tasks:
