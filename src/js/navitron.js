@@ -67,7 +67,7 @@
             var $nestedContainer = $('<div />').addClass('navitron__nested');
             var $pane = $('<div />').addClass('navitron__pane');
             var $button = $('<button type="button" />').addClass('navitron__item');
-            var $topLevelList = this.$original.children('ul');
+            var $topLevelList = $navitron.children('ul');
             var $listItems = $topLevelList.children('li');
 
             var _buildNestedLevels = function ($listItems) {
@@ -125,9 +125,10 @@
             $topLevelList.removeAttr('data-level'); // Remove the data-level set by label tree function
 
             // Build markup
-            this.$original.children('ul').wrap($pane.clone().attr('data-level', topLevel)); // Wrap top level <ul> in a pane <div>
+            $navitron.children('ul').wrap($pane.clone().attr('data-level', topLevel)); // Wrap top level <ul> in a pane <div>
             $nestedContainer.appendTo($navitron); // Add nested container that will hold all nested level panes
             _buildNestedLevels($listItems); // Build nested levels
+            $navitron.find('a').addClass('navitron__item'); // Item class for ARIA accessibility decorate function
 
             // Redefine Navitron to the new wrapper we created
             this.$navitron = $navitron;

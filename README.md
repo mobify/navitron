@@ -27,7 +27,7 @@ bower install navitron
 
 ## Usage with Require.js
 
-We highly recommend using Require.js with Navitron. To use Require, you have to reference Navitron, Navitron's effect modules, and Navitron's dependencies inside your require config file:
+We highly recommend using Require.js with Navitron. To use Require, you have to reference Navitron inside your require config file:
 
 ```config.js
 
@@ -55,11 +55,11 @@ define([
 
 ## Usage
 
-Navitron requires very minimal markup. All Navitron needs is a div with your content and it will automatically transform into what we need.
+At a bare minimum, your markup structure should follow the structure shown below. You should have at least one <nav> container with semantically correct nested lists inside. Content within list items can be whatever you want. You may also style either of those however you need. Our default theme will give you some standard styling for those elements but if you want to theme Navitron yourself, we recommend not including the theme file and starting from scratch.
 
 > To avoid any unwanted FOUT, decorate the content you will be passing to Navitron with the `hidden` attribute. The `hidden` attribute will be removed when Navitron is initialized.
 
-For accessibility and functional purposes, Navitron will wrap all of your body content in a wrapping container. This could conflict with other plugins that alter your page's markup. If you're seeing issues, try initializing Navitron after your other plugins.
+For accessibility and functional purposes, Navitron will automatically wire up ARIA functionalities to support screen readers.
 
 ```html
 <!-- Include the CSS -->
@@ -252,11 +252,11 @@ $('#myNavitron').navitron('showPane', $targetPane);
 | Mobile Safari     | 6.0+    | Supported.                   |
 | Chrome (Android)  | 38.0+   | Supported.                   |
 | Android Browser   | 4.0+    | Partial support.             |
-| IE for Win Phone  | 8.0+    | ?????????                    |
-| Firefox (Android) | 27.0+   | Supported.                   |
+| IE for Win Phone  | 8.0+    | Supported.                   |
+| Firefox (Android) | 27.0+   | Supported. (Support may exist for earlier versions but has not been tested) |
 
 
-## Known Issues
+## Known Issues and Workarounds
 
 Currently for AOSP browsers 4.0.x - 4.1.x, the panes do not animate smoothly when CSS box-shadow is applied to them and have minor rendering artifacts where some of the content is cut off. It is recommended to disable box-shadows for these browsers.
 
