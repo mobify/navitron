@@ -297,8 +297,11 @@
                             plugin.$navitron.addClass(cssClasses.ANIMATING);
                         },
                         complete: function() {
-                            // TODO: Screenreaders isn't focusing on the current pane correctly at the moment
-                            $pane.attr('aria-hidden', 'false').focus();
+                            // Temporary setting tabindex to 0 so we can force focus on this
+                            // pane for screenreaders to read out its contents.
+                            $pane.attr('aria-hidden', 'false')
+                                .attr('tabindex', '0')
+                                .focus();
 
                             plugin._trigger('shown', { pane: $pane });
                         }
@@ -320,7 +323,9 @@
                             $shiftMenu.css({ zIndex: 1 });
                         },
                         complete: function() {
-                            $shiftMenu.attr('aria-hidden', 'true');
+                            // Removing tabindex attr previously set to allow focus for screenreaders.
+                            $shiftMenu.attr('aria-hidden', 'true')
+                                .removeAttr('tabindex');
 
                             plugin._setCurrentPane($pane);
 
@@ -358,7 +363,9 @@
                         plugin.$navitron.addClass(cssClasses.ANIMATING);
                     },
                     complete: function() {
-                        $pane.attr('aria-hidden', 'true');
+                        // Removing tabindex attr previously set to allow focus for screenreaders.
+                        $pane.attr('aria-hidden', 'true')
+                            .removeAttr('tabindex');
                     }
                 })
             );
@@ -372,6 +379,13 @@
             var buttonProperties = $button.data();
             var $targetPane = this._getTargetPane(buttonProperties.targetPane);
             var translateValue = this._getTranslateX($targetPane);
+
+            // If user calls 'showPane' method on a targeted pane. The
+            // previous pane wouldn't have any translateX value set, we'll
+            // have to set the translateValue manually.
+            if ($targetPane.attr('style').length < 1) {
+                translateValue = -(100 + this.options.shiftAmount);
+            }
 
             Velocity.animate(
                 $targetPane,
@@ -392,7 +406,8 @@
                         $targetPane
                             .attr('aria-hidden', 'false')
                             .find(selectors.NEXT_PANE + '[data-target-pane="' + buttonProperties.currentPane + '"]')
-                            .attr('aria-expanded', 'false');
+                            .attr('aria-expanded', 'false')
+                            .focus();
 
                         plugin._setCurrentPane($targetPane);
                         plugin._trigger('shown', { pane: $targetPane });
