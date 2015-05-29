@@ -55,7 +55,7 @@ define([
 
 ## Usage
 
-At a bare minimum, your markup structure should follow the structure shown below. You should have at least one <nav> container with semantically correct nested lists inside. Content within list items can be whatever you want. You may also style either of those however you need. Our default theme will give you some standard styling for those elements but if you want to theme Navitron yourself, we recommend not including the theme file and starting from scratch.
+At a bare minimum, your markup structure should follow the structure shown below. You should have at least one `<nav>` container with semantically correct nested lists inside. Content within list items can be whatever you want. You may also style either of those however you need. Our default theme will give you some standard styling for those elements but if you want to theme Navitron yourself, we recommend not including the theme file and starting from scratch.
 
 > To avoid any unwanted FOUT, decorate the content you will be passing to Navitron with the `hidden` attribute. The `hidden` attribute will be removed when Navitron is initialized.
 
@@ -248,10 +248,9 @@ $('#myNavitron').navitron('showPane', $targetPane);
 
 | Browser           | Version | Support                      |
 |-------------------|---------|------------------------------|
-| Mobile Safari     | 5.1.x   | ?????????                    |
 | Mobile Safari     | 6.0+    | Supported.                   |
 | Chrome (Android)  | 38.0+   | Supported.                   |
-| Android Browser   | 4.0+    | Partial support.             |
+| Android Browser   | 4.0+    | Partial support. [See known issues](#known-issues-and-workarounds)             |
 | IE for Win Phone  | 8.0+    | Supported.                   |
 | Firefox (Android) | 27.0+   | Supported. (Support may exist for earlier versions but has not been tested) |
 
