@@ -138,8 +138,10 @@ $('#myNavitron').navitron({
 
 default: `20`
 
-Specifies how much the current pane shifts away.
-TODO: Add a gif for explanation
+Specifies how much the current pane shifts away creating a parallax effect.
+
+**Notice the pane with the green borders that's shifting in/out of view.**
+![Shift in action](https://dl.pushbulletusercontent.com/MD6m4LMIj0HCAXGUN3ZGvs3LH1BvsCNT/navitron-shift.gif "Shift in action")
 
 ```js
 $('#myNavitron').navitron({
@@ -250,7 +252,7 @@ $('#myNavitron').navitron('showPane', $targetPane);
 |-------------------|---------|------------------------------|
 | Mobile Safari     | 6.0+    | Supported.                   |
 | Chrome (Android)  | 38.0+   | Supported.                   |
-| Android Browser   | 4.0+    | Partial support. [See known issues](#known-issues-and-workarounds)             |
+| Android Browser   | 4.0+    | Partial support. [See known issues](#known-issues-and-workarounds) |
 | IE for Win Phone  | 8.0+    | Supported.                   |
 | Firefox (Android) | 27.0+   | Supported. (Support may exist for earlier versions but has not been tested) |
 
