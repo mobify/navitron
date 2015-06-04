@@ -34,6 +34,7 @@
         easing: 'swing',
         fadeOpacityTo: 0.25,
         currentPane: '0',
+        structure: false,
         show: $.noop,
         shown: $.noop
     };
@@ -61,74 +62,41 @@
         _build: function() {
             var plugin = this;
 
-            plugin._setLevelData();
-
             var $navitron = this.$original.addClass('navitron');
             var $nestedContainer = $('<div />').addClass('navitron__nested');
             var $pane = $('<div />').addClass('navitron__pane');
+            var $wrapper = $('<div />').addClass('navitron__wrapper');
             var $button = $('<button type="button" />').addClass('navitron__item');
             var $topLevelList = $navitron.children('ul');
             var $listItems = $topLevelList.children('li');
 
-            var _buildNestedLevels = function ($listItems) {
-
-                $listItems.each(function (index, item) {
-                    var $item = $(item);
-                    var $nestedList = $item.children('ul').remove();
-
-                    // If there's nested <ul> run _buildNestedLevels function again
-                    if ($nestedList.length) {
-                        // Get level data
-                        var level = $nestedList.data('level');
-                        var targetLevel = plugin._getParentLevel(level);
-
-                        // Clean up markup
-                        $nestedList.removeAttr('data-level');
-
-                        var $prevButton = $button.clone()
-                                .text('Back')
-                                .addClass('navitron__prev-pane')
-                                .attr('data-target-pane', targetLevel)
-                                .attr('data-current-pane', level);
-
-                        $prevButton.wrap('<li />').parent().prependTo($nestedList);
-
-                        // Build next level button
-                        var text = $item.text().trim();
-
-                        $item.html(
-                            $button.clone()
-                                .text(text)
-                                .attr('data-target-pane', level)
-                                .addClass('navitron__next-pane')
-                        );
-
-                        // Put nested levels into nested container
-                        $nestedList
-                            .wrap($pane.clone())
-                            .parent()
-                            .attr('data-level', level)
-                            .appendTo($nestedContainer);
-
-                        // Run again for nested level
-                        var $listItems = $nestedList.children('li');
-
-                        if ($listItems.length) {
-                            _buildNestedLevels($listItems);
-                        }
-                    }
-                });
-            };
+            // Decorate nested list with Level IDs
+            plugin._setLevelData();
 
             // Get top level data
             var topLevel = $topLevelList.attr('data-level');
             $topLevelList.removeAttr('data-level'); // Remove the data-level set by label tree function
 
-            // Build markup
-            $navitron.children('ul').wrap($pane.clone().attr('data-level', topLevel)); // Wrap top level <ul> in a pane <div>
-            $nestedContainer.appendTo($navitron); // Add nested container that will hold all nested level panes
-            _buildNestedLevels($listItems); // Build nested levels
-            $navitron.find('a').addClass('navitron__item'); // Item class for ARIA accessibility decorate function
+            // Build top level markup
+            $navitron.children('ul')
+                .addClass('navitron__content')
+                .wrap($wrapper.clone())
+                .parent()
+                .wrap($pane.clone().attr('data-level', topLevel));
+
+            // Custom markup
+            if (plugin.options.structure) {
+                plugin._includeCustomMarkup($topLevelList);
+            }
+
+            // Add nested container that will hold all nested level panes
+            $nestedContainer.appendTo($navitron);
+
+            // Build nested levels
+            this._buildNestedLevels($listItems, $nestedContainer);
+
+            // Item class for ARIA accessibility decorate function
+            $navitron.find('a').addClass('navitron__item');
 
             // Redefine Navitron to the new wrapper we created
             this.$navitron = $navitron;
@@ -138,6 +106,116 @@
 
             // Reveal navitron now that it has finished building
             this.$navitron.removeAttr('hidden');
+        },
+
+        _buildNestedLevels: function ($listItems, $nestedContainer) {
+            var plugin = this;
+
+            var $pane = $('<div />').addClass('navitron__pane');
+            var $wrapper = $('<div />').addClass('navitron__wrapper');
+            var $button = $('<button type="button" />').addClass('navitron__item');
+
+            $listItems.each(function (index, item) {
+                var $item = $(item);
+                var $nestedList = $item.children('ul').addClass('navitron__content').remove();
+
+                // If there's nested <ul> run _buildNestedLevels function again
+                if ($nestedList.length) {
+                    // Get level data
+                    var level = $nestedList.data('level');
+                    var targetLevel = plugin._getParentLevel(level);
+
+                    // Clean up markup
+                    $nestedList.removeAttr('data-level');
+
+                    // Put nested levels into nested container
+                    $nestedList
+                        .wrap($wrapper.clone())
+                        .parent()
+                        .wrap($pane.clone())
+                        .parent()
+                        .attr('data-level', level)
+                        .appendTo($nestedContainer);
+
+                    // Custom markup
+                    if (plugin.options.structure) {
+                        plugin._includeCustomMarkup($nestedList, level, targetLevel);
+                    } else {
+                        var $prevButton = $button.clone()
+                                .text('Back')
+                                .addClass('navitron__prev-pane')
+                                .attr('data-target-pane', targetLevel)
+                                .attr('data-current-pane', level);
+
+                        $prevButton.wrap('<li />').parent().prependTo($nestedList);
+                    }
+
+                    // Build next level button
+                    var text = $item.text().trim();
+
+                    $item.html(
+                        $button.clone()
+                            .text(text)
+                            .attr('data-target-pane', level)
+                            .addClass('navitron__next-pane')
+                    );
+
+                    // Run again for nested level
+                    var $listItems = $nestedList.children('li');
+
+                    if ($listItems.length) {
+                        plugin._buildNestedLevels($listItems, $nestedContainer);
+                    }
+                }
+            });
+        },
+
+        _includeCustomMarkup: function ($list, level, targetLevel) {
+            var $header = $list.children('.navitron__header').remove();
+            var $footer = $list.children('.navitron__footer').remove();
+
+            var _buildContainer = function ($element) {
+                var attrName;
+                var attrValue;
+                var attrs = '';
+                var attributeLength = $element[0].attributes.length;
+                var $backButton = $element.find('.navitron__prev-pane');
+
+                // Perserve original attributes (classes, ID, etc)
+                for (var i = 0; i < attributeLength; i++) {
+                    attrName = $element[0].attributes[i].nodeName;
+                    attrValue = $element[0].attributes[i].nodeValue;
+
+                    attrs += attrName + '="' + attrValue + '" ';
+                }
+
+                var $newContainer = $('<div ' + attrs + ' />');
+
+                if ($backButton.length) {
+                    $backButton
+                        .addClass('navitron__item')
+                        .attr('data-target-pane', targetLevel)
+                        .attr('data-current-pane', level);
+                }
+
+                $element.contents().appendTo($newContainer);
+
+                return $newContainer;
+            };
+
+            if ($header.length) {
+                var $headerContainer = _buildContainer($header);
+
+                $headerContainer.insertBefore($list);
+            }
+
+            if ($footer.length) {
+                var $footerContainer = _buildContainer($footer);
+
+                $footerContainer.insertAfter($list);
+            }
+
+            return $list;
         },
 
         _getParentLevel: function (level) {
@@ -303,6 +381,11 @@
                                 .attr('tabindex', '0')
                                 .focus();
 
+                            plugin._setCurrentPane($pane);
+
+                            // CSOPS-1332: This is to enforce only one pane to animate at a time
+                            plugin.$navitron.removeClass(cssClasses.ANIMATING);
+
                             plugin._trigger('shown', { pane: $pane });
                         }
                     })
@@ -326,11 +409,6 @@
                             // Removing tabindex attr previously set to allow focus for screenreaders.
                             $shiftMenu.attr('aria-hidden', 'true')
                                 .removeAttr('tabindex');
-
-                            plugin._setCurrentPane($pane);
-
-                            // CSOPS-1332: This is to enforce only one pane to animate at a time
-                            plugin.$navitron.removeClass(cssClasses.ANIMATING);
                         }
                     }),
                     {queue: false}
@@ -410,11 +488,11 @@
                             .focus();
 
                         plugin._setCurrentPane($targetPane);
-                        plugin._trigger('shown', { pane: $targetPane });
 
                         // CSOPS-1332: This is to enforce only one pane to animate at a time
                         plugin.$navitron.removeClass(cssClasses.ANIMATING);
 
+                        plugin._trigger('shown', { pane: $targetPane });
                     }
                 })
             );

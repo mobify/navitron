@@ -1,5 +1,5 @@
 // Navitron
-// ===
+// ========
 //
 // Navitron is a tree list menu with sliding animations for
 // drilling up or down a list item.
@@ -23,7 +23,7 @@
 
 
 // Navitron: Nested Panes Container
-// ---
+// --------------------------------
 //
 // This is the container that holds all the nested sliding panes
 // that are offsetted outside of Navitron wrapper.
@@ -54,7 +54,7 @@
 
 
 // Navitron: Sliding Pane
-// ---
+// ----------------------
 //
 // This is the sliding pane that gets animated in and out of view.
 //
@@ -97,8 +97,72 @@
     }
 }
 
+
+// Navitron: Wrapper
+// -----------------
+//
+// The Navitron Wrapper is responsible for applying a flex context that will layout
+// the children inside (i.e. header, content and footer).
+//
+// This is added to the markup automatically by Navitron, so no need to include in
+// any authored code.
+//
+//
+// Notes:
+//
+// 1. The relevant flex children are the `.navitron__header`, `.navitron__footer`
+//    and `.navitron__content`
+
+.navitron__wrapper {
+    display: flex; // 1
+    flex-direction: column;
+    overflow: hidden;
+    height: 100%;
+}
+
+
+// Navitron: Header & Footer
+// -------------------------
+//
+// The header is the top section of a Navitron pane. Typically holds a heading and
+// a back button.
+//
+//
+// Notes:
+//
+// 1. `display: flex` is coming from `.navitron__wrapper`
+// 2. This prevents the header and footer from being forced to shrink relative to
+//    other flex children (read: the content) – in other words, the header and
+//    footer will not shrink to accomodate the `.navitron__content` element
+
+.navitron__header,
+.navitron__footer {
+    flex-shrink: 0; // 1, 2
+}
+
+
+// Navitron: Content
+// -----------------
+//
+// This is the actual container for a Navitron's content. This is added automically
+// by Navitron, so you do not need to use it in your code
+//
+//
+// Notes:
+//
+// 1. `display: flex` is coming from `.navitron__wrapper`
+// 2. This allows the content to grow or shrink as necessary based on content
+//    and the header/footer
+
+.navitron__content {
+    overflow: auto;
+    flex: 1; // 1, 2
+
+    -webkit-overflow-scrolling: touch;
+}
+
 // Navitron: Hidden
-// -------------
+// ----------------
 //
 // We polyfill the hidden attribute here to ensure it hides all content when
 // applied. Navitron uses [hidden] to hide content from FOUT before the plugin is
