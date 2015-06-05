@@ -198,13 +198,14 @@ $('#myNavitron').navitron({
 
 default: `false`
 
-Defines the structure to use for Navitron panes. Specifically, Navitron tries to build its own HTML structure if passed the default options.
+Defines the structure to use for Navitron panes. By default, Navitron will automatically add a `Back' button to `.navitron__header` for each nested list.
 
 **If you want to have full control over the header, and footer section of the Navitron panes, set `structure: true`**.
 
-Setting `structure: false` will still allow the `close` event to be bound to any element that has the `pinny__close` class, allowing you to specify the element that should trigger closing your Pinny.
+Setting `structure: true` will still allow the `_hidePane` event to be bound to any element that has the `navitron__prev-pane` class, allowing you to specify the element that would trigger opening the previous pane.
 
-If you are using `structure: true`, you will need to structure your HTML to include the following elements (*missing any elements will cause Navitron to not function*):
+If you are using `structure: true`, you will need to structure your HTML to include the following elements shown below. *You must include `<button class="navitron__prev-pane">` either in `<li class="navitron__header">` **OR** `<li class="navitron__footer">` for each nested list*
+**Missing any elements will cause Navitron to not function properly.**
 
 ```html
 <nav id="myNavitron" hidden>
