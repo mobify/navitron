@@ -45,9 +45,12 @@ define([
                 expect(navitron.options.fadeOpacityTo).to.be.a('number');
             });
 
-            it('correctly defines mobileHA', function() {
-                expect(navitron.options.mobileHA).to.equal(Navitron.DEFAULTS.mobileHA);
-                expect(navitron.options.mobileHA).to.be.a('boolean');
+            it('correctly defines structure', function() {
+                // assert.equal(pinny.options.structure.header, Pinny.DEFAULTS.structure.header);
+                // assert.isString(pinny.options.structure.header);
+
+                expect(navitron.options.structure).to.equal(Navitron.DEFAULTS.structure);
+                expect(navitron.options.structure).to.be.a('boolean');
             });
         });
 
@@ -68,7 +71,7 @@ define([
                     duration: 400,
                     easing: 'ease-in-out',
                     fadeOpacityTo: 0.75,
-                    mobileHA: false
+                    structure: true
                 });
             });
 
@@ -92,9 +95,9 @@ define([
                 expect(navitron.options.fadeOpacityTo).to.be.a('number');
             });
 
-            it('correctly defines mobileHA', function() {
-                expect(navitron.options.mobileHA).to.equal(false);
-                expect(navitron.options.mobileHA).to.be.a('boolean');
+            it('correctly defines custom structure', function() {
+                expect(navitron.options.structure).to.equal(true);
+                expect(navitron.options.structure).to.be.a('boolean');
             });
         });
     });
