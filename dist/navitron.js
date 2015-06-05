@@ -33,7 +33,6 @@
         duration: 200,
         easing: 'swing',
         fadeOpacityTo: 0.25,
-        currentPane: '0',
         structure: false,
         show: $.noop,
         shown: $.noop
@@ -48,7 +47,7 @@
 
             this._build();
 
-            this.$currentPane = this._getTargetPane(this.options.currentPane);
+            this.$currentPane = this._getTargetPane(0);
 
             this._setAnimationDefaults();
 
@@ -147,7 +146,7 @@
                                 .attr('data-target-pane', targetLevel)
                                 .attr('data-current-pane', level);
 
-                        $prevButton.wrap('<li />').parent().prependTo($nestedList);
+                        $prevButton.wrap('<div class="navitron__header" />').parent().insertBefore($nestedList);
                     }
 
                     // Build next level button

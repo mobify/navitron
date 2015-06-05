@@ -126,7 +126,7 @@ $('#myNavitron').navitron({
     duration: 200,
     easing: 'swing',
     fadeOpacityTo: 0.25,
-    currentPane: '0',
+    structure: false,
     show: noop,
     shown: noop
 });
@@ -192,6 +192,60 @@ A range from 0 to 1. Sets the opacity value the pane will fade to when being ani
 $('#myNavitron').navitron({
     fadeOpacityTo: 0.5
 });
+```
+
+##### structure
+
+default: `false`
+
+Defines the structure to use for Navitron panes. Specifically, Navitron tries to build its own HTML structure if passed the default options.
+
+**If you want to have full control over the header, and footer section of the Navitron panes, set `structure: true`**.
+
+Setting `structure: false` will still allow the `close` event to be bound to any element that has the `pinny__close` class, allowing you to specify the element that should trigger closing your Pinny.
+
+If you are using `structure: true`, you will need to structure your HTML to include the following elements (*missing any elements will cause Navitron to not function*):
+
+```html
+<nav id="myNavitron" hidden>
+    <ul>
+        <li class="navitron__header">
+            <span>Top Level</span>
+        </li>
+        <li>
+            Level 1 Item 1
+            <ul>
+                <li class="navitron__header">
+                    <button class="navitron__prev-pane" type="button">
+                        Back
+                    </button>
+                    <span>Level 1 item 1 heading</span>
+                </li>
+                <li>
+                    Level 2 Item 1
+                    <ul>
+                        <li>Level 3 Item 1</li>
+                        <li>Level 3 Item 2</li>
+                        <li class="navitron__footer">
+                            <button class="navitron__prev-pane" type="button">
+                                Back
+                            </button>
+                            <span>Level 2 item 1 heading</span>
+                        </li>
+                    </ul>
+                </li>
+
+                <li>
+                    Level 2 Item 2
+                </li>
+            </ul>
+        </li>
+
+        <li>
+            Level 1 Item 2
+        </li>
+    </ul>
+</nav>
 ```
 
 ##### show
