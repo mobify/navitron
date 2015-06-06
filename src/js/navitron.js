@@ -83,7 +83,7 @@
                 .parent()
                 .wrap($pane.clone().attr('data-level', topLevel));
 
-            // Custom markup
+            // Custom markup for top level
             if (plugin.options.structure) {
                 plugin._includeCustomMarkup($topLevelList);
             }
@@ -150,14 +150,16 @@
                     }
 
                     // Build next level button
-                    var text = $item.text().trim();
+                    if (!$item.find('.navitron__next-pane').length) {
+                        var text = $item.text().trim();
 
-                    $item.html(
-                        $button.clone()
-                            .text(text)
-                            .attr('data-target-pane', level)
-                            .addClass('navitron__next-pane')
-                    );
+                        $item.html(
+                            $button.clone()
+                                .text(text)
+                                .attr('data-target-pane', level)
+                                .addClass('navitron__next-pane')
+                        );
+                    }
 
                     // Run again for nested level
                     var $listItems = $nestedList.children('li');
@@ -218,7 +220,7 @@
         },
 
         _getParentLevel: function (level) {
-            var levelParts = level.split('.');
+            var levelParts = level.toString().split('.');
 
             // Pop Off the current id
             levelParts.pop();
