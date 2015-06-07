@@ -139,6 +139,9 @@
                     // Custom markup
                     if (plugin.options.structure) {
                         plugin._includeCustomMarkup($nestedList, level, targetLevel);
+
+                        // Next level button
+                        $item.find('.navitron__next-pane').attr('data-target-pane', level);
                     } else {
                         var $prevButton = $button.clone()
                                 .text('Back')
@@ -147,10 +150,8 @@
                                 .attr('data-current-pane', level);
 
                         $prevButton.wrap('<div class="navitron__header" />').parent().insertBefore($nestedList);
-                    }
 
-                    // Build next level button
-                    if (!$item.find('.navitron__next-pane').length) {
+                        // Build next level button
                         var text = $item.text().trim();
 
                         $item.html(
