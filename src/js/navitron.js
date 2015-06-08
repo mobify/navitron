@@ -176,48 +176,81 @@
             var $header = $list.children('.navitron__header').remove();
             var $footer = $list.children('.navitron__footer').remove();
 
-            var _buildContainer = function ($element) {
-                var attrName;
-                var attrValue;
-                var attrs = '';
-                var attributeLength = $element[0].attributes.length;
-                var $backButton = $element.find('.navitron__prev-pane');
-
-                // Perserve original attributes (classes, ID, etc)
-                for (var i = 0; i < attributeLength; i++) {
-                    attrName = $element[0].attributes[i].nodeName;
-                    attrValue = $element[0].attributes[i].nodeValue;
-
-                    attrs += attrName + '="' + attrValue + '" ';
-                }
-
-                var $newContainer = $('<div ' + attrs + ' />');
-
-                if ($backButton.length) {
-                    $backButton
-                        .addClass('navitron__item')
-                        .attr('data-target-pane', targetLevel)
-                        .attr('data-current-pane', level);
-                }
-
-                $element.contents().appendTo($newContainer);
-
-                return $newContainer;
-            };
-
             if ($header.length) {
-                var $headerContainer = _buildContainer($header);
+                var $headerContainer = this._buildHeaderFooter($header, targetLevel, level);
 
                 $headerContainer.insertBefore($list);
             }
 
             if ($footer.length) {
-                var $footerContainer = _buildContainer($footer);
+                var $footerContainer = this._buildHeaderFooter($footer, targetLevel, level);
 
                 $footerContainer.insertAfter($list);
             }
 
             return $list;
+        },
+
+        _buildHeaderFooter: function ($element, targetLevel, level) {
+            var attrName;
+            var attrValue;
+            var attrs = '';
+            var attributeLength = $element[0].attributes.length;
+            var $backButton = $element.find('.navitron__prev-pane');
+
+            // Perserve original attributes (classes, ID, etc)
+            for (var i = 0; i < attributeLength; i++) {
+                attrName = $element[0].attributes[i].nodeName;
+                attrValue = $element[0].attributes[i].nodeValue;
+
+                attrs += attrName + '="' + attrValue + '" ';
+            }
+
+            var $newContainer = $('<div ' + attrs + ' />');
+
+            if ($backButton.length) {
+                $backButton
+                    .addClass('navitron__item')
+                    .attr('data-target-pane', targetLevel)
+                    .attr('data-current-pane', level);
+            }
+
+            $element.contents().appendTo($newContainer);
+
+            return $newContainer;
+        },
+
+        addPane: function(paneData) {
+            var $pane = $('<div />').addClass('navitron__pane');
+            var $wrapper = $('<div />').addClass('navitron__wrapper');
+            var $list = paneData.list;
+            var level = paneData.paneLevel;
+            var targetLevel = paneData.parentLevel;
+
+            $list.addClass('navitron__content').appendTo($wrapper);
+
+            // Append new pane to the nested container
+            $pane.attr('data-level', level)
+                .attr('aria-hidden', 'true')
+                .attr('role', 'group')
+                .attr('id', 'Navitron_' + level)
+                .appendTo(this.$navitron.find('.navitron__nested'));
+
+            if (this.options.structure) {
+                this._includeCustomMarkup($list, level, targetLevel);
+            } else {
+                var $prevButton = $button.clone()
+                        .text('Back')
+                        .addClass('navitron__prev-pane')
+                        .attr('data-target-pane', targetLevel)
+                        .attr('data-current-pane', level);
+
+                $prevButton.wrap('<div class="navitron__header" />').parent().insertBefore($list);
+            }
+
+            // TODO: Add ARIA for buttons and add navitron__item selectors
+
+            $wrapper.appendTo($pane);
         },
 
         _getParentLevel: function (level) {
