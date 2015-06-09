@@ -220,39 +220,6 @@
             return $newContainer;
         },
 
-        addPane: function(paneData) {
-            var $pane = $('<div />').addClass('navitron__pane');
-            var $wrapper = $('<div />').addClass('navitron__wrapper');
-            var $list = paneData.list;
-            var level = paneData.paneLevel;
-            var targetLevel = paneData.parentLevel;
-
-            $list.addClass('navitron__content').appendTo($wrapper);
-
-            // Append new pane to the nested container
-            $pane.attr('data-level', level)
-                .attr('aria-hidden', 'true')
-                .attr('role', 'group')
-                .attr('id', 'Navitron_' + level)
-                .appendTo(this.$navitron.find('.navitron__nested'));
-
-            if (this.options.structure) {
-                this._includeCustomMarkup($list, level, targetLevel);
-            } else {
-                var $prevButton = $button.clone()
-                        .text('Back')
-                        .addClass('navitron__prev-pane')
-                        .attr('data-target-pane', targetLevel)
-                        .attr('data-current-pane', level);
-
-                $prevButton.wrap('<div class="navitron__header" />').parent().insertBefore($list);
-            }
-
-            // TODO: Add ARIA for buttons and add navitron__item selectors
-
-            $wrapper.appendTo($pane);
-        },
-
         _getParentLevel: function (level) {
             var levelParts = level.toString().split('.');
 
