@@ -204,7 +204,8 @@ Defines the structure to use for Navitron panes. By default, Navitron will autom
 
 Setting `structure: true` will still allow the `_hidePane` event to be bound to any element that has the `navitron__prev-pane` class, allowing you to specify the element that would trigger opening the previous pane.
 
-If you are using `structure: true`, you will need to structure your HTML to include the following elements shown below. *You must include `<button class="navitron__next-pane">` in each list item with a nested list inside and `<button class="navitron__prev-pane">` either in `<li class="navitron__header">`* **OR** *`<li class="navitron__footer">` for each nested list*
+If you are using `structure: true`, you will need to structure your HTML to include the following elements shown below. *You must include `<button class="navitron__next-pane">` in each list item with a nested list inside and `<button class="navitron__prev-pane">` either in `<li class="navitron__header">`* **OR** *`<li class="navitron__footer">` for each nested list.*
+
 **Missing any elements will cause Navitron to not function properly.**
 
 ```html
