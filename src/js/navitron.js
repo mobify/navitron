@@ -141,7 +141,13 @@
                         plugin._includeCustomMarkup($nestedList, level, targetLevel);
 
                         // Next level button
-                        $item.find('.navitron__next-pane').attr('data-target-pane', level);
+                        if ($item.find('.navitron__next-pane').length) {
+                            $item.find('.navitron__next-pane')
+                                .addClass('navitron__item')
+                                .attr('data-target-pane', level);
+                        } else {
+                            throw new Error('Custom structure requires element with class "navitron__next-pane" for nested lists');
+                        }
                     } else {
                         var $prevButton = $button.clone()
                                 .text('Back')

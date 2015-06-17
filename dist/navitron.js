@@ -139,6 +139,15 @@
                     // Custom markup
                     if (plugin.options.structure) {
                         plugin._includeCustomMarkup($nestedList, level, targetLevel);
+
+                        // Next level button
+                        if ($item.find('.navitron__next-pane').length) {
+                            $item.find('.navitron__next-pane')
+                                .addClass('navitron__item')
+                                .attr('data-target-pane', level);
+                        } else {
+                            throw new Error('Custom structure requires element with class "navitron__next-pane" for nested lists');
+                        }
                     } else {
                         var $prevButton = $button.clone()
                                 .text('Back')
@@ -147,10 +156,8 @@
                                 .attr('data-current-pane', level);
 
                         $prevButton.wrap('<div class="navitron__header" />').parent().insertBefore($nestedList);
-                    }
 
-                    // Build next level button
-                    if (!$item.find('.navitron__next-pane').length) {
+                        // Build next level button
                         var text = $item.text().trim();
 
                         $item.html(
@@ -175,48 +182,48 @@
             var $header = $list.children('.navitron__header').remove();
             var $footer = $list.children('.navitron__footer').remove();
 
-            var _buildContainer = function ($element) {
-                var attrName;
-                var attrValue;
-                var attrs = '';
-                var attributeLength = $element[0].attributes.length;
-                var $backButton = $element.find('.navitron__prev-pane');
-
-                // Perserve original attributes (classes, ID, etc)
-                for (var i = 0; i < attributeLength; i++) {
-                    attrName = $element[0].attributes[i].nodeName;
-                    attrValue = $element[0].attributes[i].nodeValue;
-
-                    attrs += attrName + '="' + attrValue + '" ';
-                }
-
-                var $newContainer = $('<div ' + attrs + ' />');
-
-                if ($backButton.length) {
-                    $backButton
-                        .addClass('navitron__item')
-                        .attr('data-target-pane', targetLevel)
-                        .attr('data-current-pane', level);
-                }
-
-                $element.contents().appendTo($newContainer);
-
-                return $newContainer;
-            };
-
             if ($header.length) {
-                var $headerContainer = _buildContainer($header);
+                var $headerContainer = this._buildHeaderFooter($header, targetLevel, level);
 
                 $headerContainer.insertBefore($list);
             }
 
             if ($footer.length) {
-                var $footerContainer = _buildContainer($footer);
+                var $footerContainer = this._buildHeaderFooter($footer, targetLevel, level);
 
                 $footerContainer.insertAfter($list);
             }
 
             return $list;
+        },
+
+        _buildHeaderFooter: function ($element, targetLevel, level) {
+            var attrName;
+            var attrValue;
+            var attrs = '';
+            var attributeLength = $element[0].attributes.length;
+            var $backButton = $element.find('.navitron__prev-pane');
+
+            // Perserve original attributes (classes, ID, etc)
+            for (var i = 0; i < attributeLength; i++) {
+                attrName = $element[0].attributes[i].nodeName;
+                attrValue = $element[0].attributes[i].nodeValue;
+
+                attrs += attrName + '="' + attrValue + '" ';
+            }
+
+            var $newContainer = $('<div ' + attrs + ' />');
+
+            if ($backButton.length) {
+                $backButton
+                    .addClass('navitron__item')
+                    .attr('data-target-pane', targetLevel)
+                    .attr('data-current-pane', level);
+            }
+
+            $element.contents().appendTo($newContainer);
+
+            return $newContainer;
         },
 
         _getParentLevel: function (level) {

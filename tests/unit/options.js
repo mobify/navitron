@@ -46,9 +46,6 @@ define([
             });
 
             it('correctly defines structure', function() {
-                // assert.equal(pinny.options.structure.header, Pinny.DEFAULTS.structure.header);
-                // assert.isString(pinny.options.structure.header);
-
                 expect(navitron.options.structure).to.equal(Navitron.DEFAULTS.structure);
                 expect(navitron.options.structure).to.be.a('boolean');
             });
