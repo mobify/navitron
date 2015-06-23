@@ -127,8 +127,8 @@ $('#myNavitron').navitron({
     easing: 'swing',
     fadeOpacityTo: 0.25,
     structure: false,
-    show: noop,
-    shown: noop
+    onShow: noop,
+    onShown: noop
 });
 ```
 
@@ -250,7 +250,7 @@ If you are using `structure: true`, you will need to structure your HTML to incl
 </nav>
 ```
 
-##### show
+##### onShow
 
 default: `function(e, ui) {}`
 
@@ -265,13 +265,13 @@ Triggered every time Navitron is starting to animate a pane.
 
 ```js
 $('#myNavitron').navitron({
-    show: function(e, ui) {
+    onShow: function(e, ui) {
         // ui.pane contains the pane animating in
     }
 });
 ```
 
-##### shown
+##### onShown
 
 default: `function(e, ui) {}`
 
@@ -286,7 +286,7 @@ Triggered every time Navitron has finished animating a pane.
 
 ```js
 $('#myNavitron').navitron({
-    shown: function(e, ui) {
+    onShown: function(e, ui) {
         // ui.pane contains the pane that is shown
     }
 });

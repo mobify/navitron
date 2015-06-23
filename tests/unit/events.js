@@ -21,11 +21,11 @@ define([
             testSandbox.setUp('sandbox', setUpComplete);
         });
 
-        it('fires the show event before navitron pane slides in', function(done) {
+        it('fires the onShow event before navitron pane slides in', function(done) {
             console.info($element);
 
             $element.navitron({
-                show: function() {
+                onShow: function() {
                     done();
                 }
             });
@@ -33,11 +33,11 @@ define([
             $element.navitron('showPane', $nestedPane);
         });
 
-        it('fires the shown event after navitron pane is slid in', function(done) {
+        it('fires the onShown event after navitron pane is slid in', function(done) {
             console.info($element);
 
             $element.navitron({
-                shown: function() {
+                onShown: function() {
                     done();
                 }
             });

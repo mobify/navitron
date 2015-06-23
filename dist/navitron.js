@@ -34,8 +34,8 @@
         easing: 'swing',
         fadeOpacityTo: 0.25,
         structure: false,
-        show: $.noop,
-        shown: $.noop
+        onShow: $.noop,
+        onShown: $.noop
     };
 
     Plugin.create('navitron', Navitron, {
@@ -238,22 +238,34 @@
         _setLevelData: function() {
             var selector = '> li > ul ';
             var $topLevel = this.$original.children('ul');
+            var categoryId;
 
             $topLevel.attr('data-level', '0');
 
             while (true) {
                 var $children = $topLevel.find(selector);
+                var refreshIndex = 0;
 
                 if ($children.length) {
                     $children.each(function (index, item) {
-
                         var $child = $(item);
+
                         // Grabbing ul parent
                         var $parent = $child.parents('ul').first();
 
-                        if ($parent.length) {
-                            $child.attr('data-level', $parent.attr('data-level') + '.' + index);
+                        // Check if we have moved onto a different Category
+                        // We 'reset' the index so nested items always start at 0 and onwards
+                        var level = parseInt($parent.data('level').toString().split('.').pop());
+                        if (level !== categoryId) {
+                            categoryId = level;
+                            refreshIndex = 0;
                         }
+
+                        if ($parent.length) {
+                            $child.attr('data-level', $parent.attr('data-level') + '.' + refreshIndex);
+                        }
+
+                        refreshIndex++;
                     }); // jshint ignore:line
 
                     selector += '> li > ul';
@@ -373,7 +385,7 @@
                     $.extend(true, {}, this.animationDefaults, {
                         display: 'block',
                         begin: function() {
-                            plugin._trigger('show', { pane: $pane });
+                            plugin._trigger('onShow', { pane: $pane });
 
                             // Setting z-index to make sure pane sliding in will always be on top
                             // of pane that's being shifted out
@@ -394,7 +406,7 @@
                             // CSOPS-1332: This is to enforce only one pane to animate at a time
                             plugin.$navitron.removeClass(cssClasses.ANIMATING);
 
-                            plugin._trigger('shown', { pane: $pane });
+                            plugin._trigger('onShown', { pane: $pane });
                         }
                     })
                 );
@@ -500,7 +512,7 @@
                         // CSOPS-1332: This is to enforce only one pane to animate at a time
                         plugin.$navitron.removeClass(cssClasses.ANIMATING);
 
-                        plugin._trigger('shown', { pane: $targetPane });
+                        plugin._trigger('onShown', { pane: $targetPane });
                     }
                 })
             );
