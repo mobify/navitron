@@ -22,6 +22,23 @@
 }
 
 
+// Navitron: Nested Panes Container + Sliding Panes
+// ------------------------------------------------
+//
+// Notes:
+//
+// 1. Absolute positioned to `.navitron` to match the same container dimension
+
+.navitron__nested,
+.navitron__pane {
+    position: absolute; // 1
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+
 // Navitron: Nested Panes Container
 // --------------------------------
 //
@@ -29,26 +46,17 @@
 // that are offsetted outside of Navitron wrapper.
 //
 //
-// Notes:
-//
-// 1. Absolute positioned to `.navitron` to match the same dimension
-//    for absolute positioned `.navitron__pane` panes.
-// 2. Hide nested panes by default.
+
+// 1. Hide nested panes by default.
 //
 //    [Note] Must keep this as 'display: none' otherwise you can
 //    crash the browser translating too many divs at once.
 
 .navitron__nested {
-    position: absolute; // 1
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-
     transform: translate3d(100%, 0, 0);
 
     .navitron__pane {
-        display: none; // 2
+        display: none; // 1
     }
 }
 
@@ -71,16 +79,8 @@
 // 4. It's worth noting that on legacy Android browsers (4.0 - 4.1), the panes
 //    do not animate in smoothly with box-shadows applied. It's recommended to have
 //    box-shadows disabled for legacy Android browsers for performance reasons.
-// 5. Absolute positioned to `.navitron` and `.navitron__nested` to cover up
-//    the container's width and height.
 
 .navitron__pane {
-    position: absolute; // 5
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-
     overflow-x: hidden;
     overflow-y: auto;
     width: 100%;
