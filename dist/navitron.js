@@ -387,10 +387,6 @@
                         begin: function() {
                             plugin._trigger('onShow', { pane: $pane });
 
-                            // Setting z-index to make sure pane sliding in will always be on top
-                            // of pane that's being shifted out
-                            $pane.css({ zIndex: 2 });
-
                             // CSOPS-1332: This is to enforce only one pane to animate at a time
                             plugin.$navitron.addClass(cssClasses.ANIMATING);
                         },
@@ -420,11 +416,6 @@
                     },
                     $.extend(true, {}, this.animationDefaults, {
                         display: 'none',
-                        begin: function() {
-                            // Setting z-index to make sure pane shifting out will always be below
-                            // the pane that's being slided in
-                            $shiftMenu.css({ zIndex: 1 });
-                        },
                         complete: function() {
                             // Removing tabindex attr previously set to allow focus for screenreaders.
                             $shiftMenu.attr('aria-hidden', 'true')
@@ -451,12 +442,6 @@
                 $.extend(true, {}, this.animationDefaults, {
                     display: 'none',
                     begin: function() {
-                        // Setting z-index to make sure pane shifting out will always be above
-                        // the pane that's being shifted back in
-                        $pane.css({
-                            zIndex: 2
-                        });
-
                         // CSOPS-1332: This is to enforce only one pane to animate at a time
                         plugin.$navitron.addClass(cssClasses.ANIMATING);
                     },
@@ -493,13 +478,6 @@
                 },
                 $.extend(true, {}, this.animationDefaults, {
                     display: 'block',
-                    begin: function() {
-                        // Setting z-index to make sure pane shifting in will always be below
-                        // of pane that's being slided out
-                        $targetPane.css({
-                            zIndex: 1
-                        });
-                    },
                     complete: function() {
                         $targetPane
                             .attr('aria-hidden', 'false')
