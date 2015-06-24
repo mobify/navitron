@@ -296,9 +296,11 @@ $('#myNavitron').navitron({
 
 ## Methods
 
-### Show Pane
+### showPane
 
-Show the selected pane by element reference
+Show the selected pane by element reference.
+
+Can be used to show a specific nested list to show on page load.
 
 ```js
 $('#myNavitron').navitron('showPane', $targetPane);
