@@ -333,9 +333,12 @@ Currently for AOSP browsers 4.0.x - 4.1.x, the panes do not animate smoothly whe
 
 
 ### Steps
+1. Clone Navitron repo
 1. `npm install`
 1. `bower install`
 1. `grunt serve`
+1. Preview the site at http://localhost:3000
+1. Navigate to examples folder
 
 
 ### Grunt Tasks:

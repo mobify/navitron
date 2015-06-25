@@ -15,7 +15,8 @@
         NESTED_PANE: '.navitron__nested > .navitron__pane',
         ITEM: '.navitron__item',
         NEXT_PANE: '.navitron__next-pane',
-        PREV_PANE: '.navitron__prev-pane'
+        PREV_PANE: '.navitron__prev-pane',
+        CONTENT: '.navitron__content'
     };
 
     var cssClasses = {
@@ -51,6 +52,10 @@
 
             this._setAnimationDefaults();
 
+            this.$listItems = this.$original.find(selectors.ITEM);
+
+            this.$visibleItems = this.$listItems.filter(':visible');
+
             this._bindEvents();
         },
 
@@ -81,7 +86,10 @@
                 .addClass('navitron__content')
                 .wrap($wrapper.clone())
                 .parent()
-                .wrap($pane.clone().attr('data-level', topLevel));
+                .wrap(
+                    $pane.clone()
+                        .attr('data-level', topLevel)
+                );
 
             // Custom markup for top level
             if (plugin.options.structure) {
@@ -95,7 +103,7 @@
             this._buildNestedLevels($listItems, $nestedContainer);
 
             // Item class for ARIA accessibility decorate function
-            $navitron.find('a').addClass('navitron__item');
+            $navitron.find('button, a').addClass('navitron__item');
 
             // Redefine Navitron to the new wrapper we created
             this.$navitron = $navitron;
@@ -236,34 +244,35 @@
         },
 
         _setLevelData: function() {
-            var selector = '> li > ul ';
             var $topLevel = this.$original.children('ul');
+            var selector = '> li > ul ';
             var categoryId;
 
+            // Set root data-level to 0
             $topLevel.attr('data-level', '0');
 
             while (true) {
-                var $children = $topLevel.find(selector);
+                var $nestedLists = $topLevel.find(selector);
                 var refreshIndex = 0;
 
-                if ($children.length) {
-                    $children.each(function (index, item) {
-                        var $child = $(item);
+                if ($nestedLists.length) {
+                    $nestedLists.each(function (index, item) {
+                        var $nestedList = $(item);
 
                         // Grabbing ul parent
-                        var $parent = $child.parents('ul').first();
+                        var $parent = $nestedList.parents('ul').first();
+                        var dataLevel = $parent.data('level');
 
                         // Check if we have moved onto a different Category
                         // We 'reset' the index so nested items always start at 0 and onwards
-                        var level = parseInt($parent.data('level').toString().split('.').pop());
+                        var level = parseInt(dataLevel.toString().split('.').pop());
                         if (level !== categoryId) {
                             categoryId = level;
                             refreshIndex = 0;
                         }
 
-                        if ($parent.length) {
-                            $child.attr('data-level', $parent.attr('data-level') + '.' + refreshIndex);
-                        }
+                        // Set data-level to each nested list
+                        $nestedList.attr('data-level', dataLevel + '.' + refreshIndex);
 
                         refreshIndex++;
                     }); // jshint ignore:line
@@ -291,7 +300,6 @@
                 var levelId = $el.data('level');
 
                 // Prefixing ID with 'Navitron_' to ensure we don't set a duplicate client ID accidentally
-                // TODO: What if the navitron pane has an ID already? How do we handle that?
                 $el
                     .attr('role', 'group')
                     .attr('aria-hidden', 'true')
@@ -362,6 +370,48 @@
                 // Slide out current level
                 plugin._hidePane(plugin.$currentPane, $button);
             });
+
+            /**
+             * Keyboard controls to navigate through items and menus
+             */
+            this.$listItems.on('keydown', function(e) {
+                return plugin._handleKeyDown($(this), e);
+            });
+        },
+
+        _handleKeyDown: function($item, e) {
+            var $focusedItem = this.$visibleItems.filter(':focus');
+            var focusableItemsCount = this.$visibleItems.length - 1; // Slight tweak of the number to match array indexing
+            var itemIndex = this.$visibleItems.index($focusedItem);
+
+            // Left arrow: Drill up menu
+            if (e.which === 37) {
+                var $backButton = $item.parents(selectors.PANE).find(selectors.PREV_PANE);
+
+                if ($backButton.length) {
+                    $backButton.trigger('click');
+                }
+
+                e.preventDefault();
+            }
+
+            // Right arrow: Drill down menu item OR click on menu item link
+            if (e.which === 39 || e.which === 32) {
+                $item.trigger('click');
+                e.preventDefault();
+            }
+
+            // Up arrow: Previous menu item
+            if (e.which === 38 && itemIndex > 0) {
+                this.$visibleItems[itemIndex - 1].focus();
+                e.preventDefault();
+            }
+
+            // Down arrow: Next menu item
+            if (e.which === 40 && focusableItemsCount > itemIndex) {
+                this.$visibleItems[itemIndex + 1].focus();
+                e.preventDefault();
+            }
         },
 
         showPane: function($pane) {
@@ -385,24 +435,30 @@
                     $.extend(true, {}, this.animationDefaults, {
                         display: 'block',
                         begin: function() {
-                            plugin._trigger('onShow', { pane: $pane });
-
                             // CSOPS-1332: This is to enforce only one pane to animate at a time
                             plugin.$navitron.addClass(cssClasses.ANIMATING);
+
+                            plugin._trigger('onShow', { pane: $pane });
                         },
                         complete: function() {
-                            // Temporary setting tabindex to 0 so we can force focus on this
-                            // pane for screenreaders to read out its contents.
-                            $pane.attr('aria-hidden', 'false')
-                                .attr('tabindex', '0')
-                                .focus();
+                            // Complete callback function actually gets called BEFORE animation finishes
+                            // animating. Performing these functions at this point would causing
+                            // jank in the animation. We'll use setTimeout to 0 to queue up
+                            // these functions to improve animation performance.
+                            setTimeout(function() {
+                                // CSOPS-1332: This is to enforce only one pane to animate at a time
+                                plugin.$navitron.removeClass(cssClasses.ANIMATING);
 
-                            plugin._setCurrentPane($pane);
+                                $pane.attr('aria-hidden', 'false');
 
-                            // CSOPS-1332: This is to enforce only one pane to animate at a time
-                            plugin.$navitron.removeClass(cssClasses.ANIMATING);
+                                plugin._setCurrentPane($pane);
 
-                            plugin._trigger('onShown', { pane: $pane });
+                                // Keyboard navigation
+                                plugin.$visibleItems = $pane.find(selectors.ITEM).filter(':visible');
+                                $pane.find(selectors.CONTENT).find(selectors.ITEM).eq(0).focus();
+
+                                plugin._trigger('onShown', { pane: $pane });
+                            }, 0);
                         }
                     })
                 );
@@ -417,9 +473,7 @@
                     $.extend(true, {}, this.animationDefaults, {
                         display: 'none',
                         complete: function() {
-                            // Removing tabindex attr previously set to allow focus for screenreaders.
-                            $shiftMenu.attr('aria-hidden', 'true')
-                                .removeAttr('tabindex');
+                            $shiftMenu.attr('aria-hidden', 'true');
                         }
                     }),
                     {queue: false}
@@ -441,14 +495,8 @@
                 },
                 $.extend(true, {}, this.animationDefaults, {
                     display: 'none',
-                    begin: function() {
-                        // CSOPS-1332: This is to enforce only one pane to animate at a time
-                        plugin.$navitron.addClass(cssClasses.ANIMATING);
-                    },
                     complete: function() {
-                        // Removing tabindex attr previously set to allow focus for screenreaders.
-                        $pane.attr('aria-hidden', 'true')
-                            .removeAttr('tabindex');
+                        $pane.attr('aria-hidden', 'true');
                     }
                 })
             );
@@ -478,19 +526,30 @@
                 },
                 $.extend(true, {}, this.animationDefaults, {
                     display: 'block',
-                    complete: function() {
-                        $targetPane
-                            .attr('aria-hidden', 'false')
-                            .find(selectors.NEXT_PANE + '[data-target-pane="' + buttonProperties.currentPane + '"]')
-                            .attr('aria-expanded', 'false')
-                            .focus();
-
-                        plugin._setCurrentPane($targetPane);
-
+                    begin: function() {
                         // CSOPS-1332: This is to enforce only one pane to animate at a time
-                        plugin.$navitron.removeClass(cssClasses.ANIMATING);
+                        plugin.$navitron.addClass(cssClasses.ANIMATING);
 
-                        plugin._trigger('onShown', { pane: $targetPane });
+                        plugin._trigger('onShow', { pane: $targetPane });
+                    },
+                    complete: function() {
+                        setTimeout(function() {
+                            // CSOPS-1332: This is to enforce only one pane to animate at a time
+                            plugin.$navitron.removeClass(cssClasses.ANIMATING);
+
+                            $targetPane
+                                .attr('aria-hidden', 'false')
+                                .find(selectors.NEXT_PANE + '[data-target-pane="' + buttonProperties.currentPane + '"]')
+                                .attr('aria-expanded', 'false')
+                                .focus();
+
+                            plugin._setCurrentPane($targetPane);
+
+                            plugin._trigger('onShown', { pane: $targetPane });
+
+                            // Setting new controllable items for keyboard navigation
+                            plugin.$visibleItems = $targetPane.find(selectors.ITEM).filter(':visible');
+                        }, 0);
                     }
                 })
             );
