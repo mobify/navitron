@@ -94,7 +94,7 @@
     -webkit-overflow-scrolling: touch;
     -webkit-backface-visibility: hidden; // 2
 
-    .navitron.navitron--is-animating & {
+    .navitron--is-animating & {
         box-shadow: 0 0 20px rgba(0, 0, 0, 0.8); // 4
     }
 }

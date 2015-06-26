@@ -20,7 +20,8 @@
     };
 
     var cssClasses = {
-        ANIMATING: 'navitron--is-animating'
+        ANIMATING: 'navitron--is-animating',
+        NEXT_PANE: 'navitron__next-pane'
     };
 
     function Navitron(element, options) {
@@ -54,7 +55,7 @@
 
             this.$listItems = this.$original.find(selectors.ITEM);
 
-            this.$visibleItems = this.$listItems.filter(':visible');
+            this.$visibleItems = this.$currentPane.find(selectors.ITEM);
 
             this._bindEvents();
         },
@@ -374,42 +375,74 @@
             /**
              * Keyboard controls to navigate through items and menus
              */
-            this.$listItems.on('keydown', function(e) {
-                return plugin._handleKeyDown($(this), e);
+            this.$navitron.on('keydown', selectors.PANE, function(e) {
+                plugin._handleKeyDown($(this), e);
             });
         },
 
-        _handleKeyDown: function($item, e) {
+        _handleKeyDown: function($pane, e) {
+            var $list = $pane.find(selectors.CONTENT);
+            var $listItems = $list.find(selectors.ITEM);
             var $focusedItem = this.$visibleItems.filter(':focus');
             var focusableItemsCount = this.$visibleItems.length - 1; // Slight tweak of the number to match array indexing
             var itemIndex = this.$visibleItems.index($focusedItem);
 
+            // Spacebar: Action to click on menu items
+            if (e.which === 32) {
+                $focusedItem.trigger('click');
+                e.preventDefault();
+            }
+
             // Left arrow: Drill up menu
             if (e.which === 37) {
-                var $backButton = $item.parents(selectors.PANE).find(selectors.PREV_PANE);
+                var $backButton = $pane.find(selectors.PREV_PANE);
 
                 if ($backButton.length) {
                     $backButton.trigger('click');
                 }
-
                 e.preventDefault();
             }
 
             // Right arrow: Drill down menu item OR click on menu item link
-            if (e.which === 39 || e.which === 32) {
-                $item.trigger('click');
+            if (e.which === 39 && $focusedItem.hasClass(cssClasses.NEXT_PANE)) {
+                $focusedItem.trigger('click');
                 e.preventDefault();
             }
 
+            this._handleNextPrevItem(e, $list, $listItems, focusableItemsCount, itemIndex);
+        },
+
+        _handleNextPrevItem: function(e, $list, $listItems, focusableItemsCount, itemIndex) {
             // Up arrow: Previous menu item
-            if (e.which === 38 && itemIndex > 0) {
-                this.$visibleItems[itemIndex - 1].focus();
+            if (e.which === 38) {
+                if ($list.is(':focus')) {
+                    // Allow focus to shift from list to items before it
+                    itemIndex = this.$visibleItems.index($listItems);
+                }
+
+                if (itemIndex > 0) {
+                    this.$visibleItems[itemIndex - 1].focus();
+                }
                 e.preventDefault();
             }
 
             // Down arrow: Next menu item
             if (e.which === 40 && focusableItemsCount > itemIndex) {
-                this.$visibleItems[itemIndex + 1].focus();
+                if ($list.is(':focus')) {
+                    // Shift focus from list to the first item
+                    itemIndex = this.$visibleItems.index($listItems);
+
+                    this.$visibleItems[itemIndex].focus();
+                } else {
+                    // Next menu item
+                    this.$visibleItems[itemIndex + 1].focus();
+                }
+                e.preventDefault();
+            }
+
+            // Down arrow: End of list, send focus to back button
+            if (e.which === 40 && focusableItemsCount === itemIndex) {
+                this.$visibleItems.filter(selectors.PREV_PANE).focus();
                 e.preventDefault();
             }
         },
@@ -428,56 +461,56 @@
             var $shiftMenu = this.$currentPane;
             var translateValue = this._getTranslateX($shiftMenu);
 
-            Velocity
-                .animate(
-                    $pane,
-                    { translateX: ['-100%', 0] },
-                    $.extend(true, {}, this.animationDefaults, {
-                        display: 'block',
-                        begin: function() {
-                            // CSOPS-1332: This is to enforce only one pane to animate at a time
-                            plugin.$navitron.addClass(cssClasses.ANIMATING);
+            Velocity.animate(
+                $pane,
+                { translateX: ['-100%', 0] },
+                $.extend(true, {}, this.animationDefaults, {
+                    display: 'block',
+                    begin: function() {
+                        // CSOPS-1332: This is to enforce only one pane to animate at a time
+                        plugin.$navitron.addClass(cssClasses.ANIMATING);
 
-                            plugin._trigger('onShow', { pane: $pane });
-                        },
-                        complete: function() {
-                            // Complete callback function actually gets called BEFORE animation finishes
-                            // animating. Performing these functions at this point would causing
-                            // jank in the animation. We'll use setTimeout to 0 to queue up
-                            // these functions to improve animation performance.
-                            setTimeout(function() {
-                                // CSOPS-1332: This is to enforce only one pane to animate at a time
-                                plugin.$navitron.removeClass(cssClasses.ANIMATING);
-
-                                $pane.attr('aria-hidden', 'false');
-
-                                plugin._setCurrentPane($pane);
-
-                                // Keyboard navigation
-                                plugin.$visibleItems = $pane.find(selectors.ITEM).filter(':visible');
-                                $pane.find(selectors.CONTENT).find(selectors.ITEM).eq(0).focus();
-
-                                plugin._trigger('onShown', { pane: $pane });
-                            }, 0);
-                        }
-                    })
-                );
-
-            Velocity
-                .animate(
-                    $shiftMenu,
-                    {
-                        translateX: [(translateValue - this.options.shiftAmount) + '%', translateValue + '%'],
-                        opacity: [this.options.fadeOpacityTo, 1]
+                        plugin._trigger('onShow', { pane: $pane });
                     },
-                    $.extend(true, {}, this.animationDefaults, {
-                        display: 'none',
-                        complete: function() {
-                            $shiftMenu.attr('aria-hidden', 'true');
-                        }
-                    }),
-                    {queue: false}
-                );
+                    complete: function() {
+                        // Complete callback function actually gets called BEFORE animation finishes
+                        // animating. Performing these functions at this point would causing
+                        // jank in the animation. We'll use requestAnimationFrame to queue up these
+                        // functions after animation has ended.
+                        window.requestAnimationFrame(function() {
+                            // CSOPS-1332: This is to enforce only one pane to animate at a time
+                            plugin.$navitron.removeClass(cssClasses.ANIMATING);
+
+                            $pane.attr('aria-hidden', 'false');
+
+                            plugin._setCurrentPane($pane);
+
+                            // Keyboard navigation
+                            plugin.setFocusableItems($pane);
+
+                            // Send focus to <ul> list
+                            $pane.find(selectors.CONTENT).attr('tabindex', 0).focus();
+
+                            plugin._trigger('onShown', { pane: $pane });
+                        });
+                    }
+                })
+            );
+
+            Velocity.animate(
+                $shiftMenu,
+                {
+                    translateX: [(translateValue - this.options.shiftAmount) + '%', translateValue + '%'],
+                    opacity: [this.options.fadeOpacityTo, 1]
+                },
+                $.extend(true, {}, this.animationDefaults, {
+                    display: 'none',
+                    complete: function() {
+                        $shiftMenu.attr('aria-hidden', 'true');
+                    }
+                }),
+                {queue: false}
+            );
         },
 
         _hidePane: function($pane, $button) {
@@ -533,10 +566,11 @@
                         plugin._trigger('onShow', { pane: $targetPane });
                     },
                     complete: function() {
-                        setTimeout(function() {
+                        window.requestAnimationFrame(function() {
                             // CSOPS-1332: This is to enforce only one pane to animate at a time
                             plugin.$navitron.removeClass(cssClasses.ANIMATING);
 
+                            // Send focus back to parent menu item
                             $targetPane
                                 .attr('aria-hidden', 'false')
                                 .find(selectors.NEXT_PANE + '[data-target-pane="' + buttonProperties.currentPane + '"]')
@@ -548,11 +582,16 @@
                             plugin._trigger('onShown', { pane: $targetPane });
 
                             // Setting new controllable items for keyboard navigation
-                            plugin.$visibleItems = $targetPane.find(selectors.ITEM).filter(':visible');
-                        }, 0);
+                            plugin.setFocusableItems($targetPane);
+                        });
                     }
                 })
             );
+        },
+
+        setFocusableItems: function($pane) {
+            // Exposing this method for cases when menu items gets Ajax'd in.
+            this.$visibleItems = $pane.find(selectors.ITEM);
         },
 
         _setCurrentPane: function ($pane) {
