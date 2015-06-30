@@ -31,10 +31,10 @@
     Navitron.VERSION = '0';
 
     Navitron.DEFAULTS = {
-        shiftAmount: 20,
+        shiftAmount: 100, // 20,
         duration: 200,
         easing: 'swing',
-        fadeOpacityTo: 0.25,
+        fadeOpacityTo: 1, // 0.25,
         structure: false,
         onShow: $.noop,
         onShown: $.noop
@@ -463,7 +463,7 @@
 
             Velocity.animate(
                 $pane,
-                { translateX: ['-100%', 0] },
+                { translateX: [0, 0] }, // ['-100%', 0]
                 $.extend(true, {}, this.animationDefaults, {
                     display: 'block',
                     begin: function() {
@@ -524,7 +524,7 @@
             Velocity.animate(
                 $pane,
                 {
-                    translateX: [0, '-100%']
+                    translateX: [0, 0] // [0, '-100%']
                 },
                 $.extend(true, {}, this.animationDefaults, {
                     display: 'none',

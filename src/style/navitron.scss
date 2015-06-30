@@ -53,7 +53,7 @@
 //    crash the browser translating too many divs at once.
 
 .navitron__nested {
-    transform: translate3d(100%, 0, 0);
+    transform: translate3d(0, 0, 0); // transform: translate3d(100%, 0, 0);
 
     .navitron__pane {
         display: none; // 1
@@ -90,6 +90,8 @@
     box-shadow: none; // 3
 
     transform: translate3d(0, 0, 0);
+
+    z-index: 1; // originally, no z-index! Only needed for reverse animation test
 
     -webkit-overflow-scrolling: touch;
     -webkit-backface-visibility: hidden; // 2
