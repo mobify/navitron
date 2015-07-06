@@ -13,7 +13,6 @@ define([
                 $ = iFrame$;
                 Navitron = $.fn.navitron.Constructor;
                 $element = $(fixture);
-                $nestedPane = $element.find('.navitron__nested .navitron__pane').first();
 
                 done();
             };
@@ -30,6 +29,8 @@ define([
                 }
             });
 
+            var $nestedPane = $element.find('.navitron__nested .navitron__pane').first();
+
             $element.navitron('showPane', $nestedPane);
         });
 
@@ -41,6 +42,8 @@ define([
                     done();
                 }
             });
+
+            var $nestedPane = $element.find('.navitron__nested .navitron__pane').first();
 
             $element.navitron('showPane', $nestedPane);
         });

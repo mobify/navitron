@@ -21,7 +21,25 @@
 
     var cssClasses = {
         ANIMATING: 'navitron--is-animating',
-        NEXT_PANE: 'navitron__next-pane'
+        NESTED_CONTAINER: 'navitron__nested',
+        PANE: 'navitron__pane',
+        WRAPPER: 'navitron__wrapper',
+        HEADER: 'navitron__header',
+        FOOTER: 'navitron__footer',
+        NEXT_PANE: 'navitron__next-pane',
+        ITEM: 'navitron__item'
+    };
+
+    /**
+     * Template constants required for building the default HTML structure
+     */
+    var template = {
+        NESTED_CONTAINER: '<div class="' + cssClasses.NESTED_CONTAINER + '"></div>',
+        PANE: '<div class="' + cssClasses.PANE + '"></div>',
+        WRAPPER: '<div class="' + cssClasses.WRAPPER + '"></div>',
+        HEADER: '<div class="' + cssClasses.HEADER + '"></div>',
+        FOOTER: '<div class="' + cssClasses.FOOTER + '"></div>',
+        BUTTON: '<button type="button" class="' + cssClasses.ITEM + '"></button>',
     };
 
     function Navitron(element, options) {
@@ -64,14 +82,156 @@
             this.$navitron.removeData(this.name);
         },
 
+        showPane: function($pane) {
+            if (!$pane.length) {
+                throw new Error('The showPane method requires a pane element to show');
+            }
+
+            // Enforce only one pane to animate at a time
+            if (this._isAnimating()) {
+                return;
+            }
+
+            var plugin = this;
+            var $shiftMenu = this.$currentPane;
+            var translateValue = this._getTranslateX($shiftMenu);
+
+            Velocity.animate(
+                $pane,
+                { translateX: ['-100%', 0] },
+                $.extend(true, {}, this.animationDefaults, {
+                    display: 'block',
+                    begin: function() {
+                        // Enforce only one pane to animate at a time
+                        plugin.$navitron.addClass(cssClasses.ANIMATING);
+
+                        plugin._trigger('onShow', { pane: $pane });
+                    },
+                    complete: function() {
+                        // Complete callback function actually gets called BEFORE animation finishes
+                        // animating. Performing these functions at this point would causing
+                        // jank in the animation. We'll use requestAnimationFrame to queue up these
+                        // functions after animation has ended.
+                        window.requestAnimationFrame(function() {
+                            // Enforce only one pane to animate at a time
+                            plugin.$navitron.removeClass(cssClasses.ANIMATING);
+
+                            $pane.attr('aria-hidden', 'false');
+
+                            plugin._setCurrentPane($pane);
+
+                            // Keyboard navigation
+                            plugin.setFocusableItems($pane);
+
+                            // Send focus to <ul> list
+                            $pane.find(selectors.CONTENT).attr('tabindex', 0).focus();
+
+                            plugin._trigger('onShown', { pane: $pane });
+                        });
+                    }
+                })
+            );
+
+            Velocity.animate(
+                $shiftMenu,
+                {
+                    translateX: [(translateValue - this.options.shiftAmount) + '%', translateValue + '%'],
+                    opacity: [this.options.fadeOpacityTo, 1]
+                },
+                $.extend(true, {}, this.animationDefaults, {
+                    display: 'none',
+                    complete: function() {
+                        $shiftMenu.attr('aria-hidden', 'true');
+                    }
+                }),
+                {queue: false}
+            );
+        },
+
+        _hidePane: function($pane, $button) {
+            var plugin = this;
+
+            // Enforce only one pane to animate at a time
+            if (this._isAnimating()) {
+                return;
+            }
+
+            Velocity.animate(
+                $pane,
+                {
+                    translateX: [0, '-100%']
+                },
+                $.extend(true, {}, this.animationDefaults, {
+                    display: 'none',
+                    complete: function() {
+                        $pane.attr('aria-hidden', 'true');
+                    }
+                })
+            );
+
+            // Shift in current Level
+            plugin._showPreviousPane($button);
+        },
+
+        _showPreviousPane: function($button) {
+            var plugin = this;
+            var buttonProperties = $button.data();
+            var $targetPane = this._getTargetPane(buttonProperties.targetPane);
+            var translateValue = this._getTranslateX($targetPane);
+
+            // If user calls 'showPane' method on a targeted pane. The
+            // previous pane wouldn't have any translateX value set, we'll
+            // have to set the translateValue manually.
+            if ($targetPane.attr('style').length < 1) {
+                translateValue = -(100 + this.options.shiftAmount);
+            }
+
+            Velocity.animate(
+                $targetPane,
+                {
+                    translateX: [(translateValue + this.options.shiftAmount) + '%', translateValue + '%'],
+                    opacity: [1, this.options.fadeOpacityTo]
+                },
+                $.extend(true, {}, this.animationDefaults, {
+                    display: 'block',
+                    begin: function() {
+                        // Enforce only one pane to animate at a time
+                        plugin.$navitron.addClass(cssClasses.ANIMATING);
+
+                        plugin._trigger('onShow', { pane: $targetPane });
+                    },
+                    complete: function() {
+                        window.requestAnimationFrame(function() {
+                            // Enforce only one pane to animate at a time
+                            plugin.$navitron.removeClass(cssClasses.ANIMATING);
+
+                            // Send focus back to parent menu item
+                            $targetPane
+                                .attr('aria-hidden', 'false')
+                                .find(selectors.NEXT_PANE + '[data-target-pane="' + buttonProperties.currentPane + '"]')
+                                .attr('aria-expanded', 'false')
+                                .focus();
+
+                            plugin._setCurrentPane($targetPane);
+
+                            plugin._trigger('onShown', { pane: $targetPane });
+
+                            // Setting new controllable items for keyboard navigation
+                            plugin.setFocusableItems($targetPane);
+                        });
+                    }
+                })
+            );
+        },
+
         _build: function() {
             var plugin = this;
 
             var $navitron = this.$original.addClass('navitron');
-            var $nestedContainer = $('<div />').addClass('navitron__nested');
-            var $pane = $('<div />').addClass('navitron__pane');
-            var $wrapper = $('<div />').addClass('navitron__wrapper');
-            var $button = $('<button type="button" />').addClass('navitron__item');
+            var $nestedContainer = $(template.NESTED_CONTAINER);
+            var $pane = $(template.PANE);
+            var $wrapper = $(template.WRAPPER);
+            var $button = $(template.BUTTON);
             var $topLevelList = $navitron.children('ul');
             var $listItems = $topLevelList.children('li');
 
@@ -95,6 +255,10 @@
             // Custom markup for top level
             if (plugin.options.structure) {
                 plugin._includeCustomMarkup($topLevelList);
+            } else {
+                if ($navitron.find(selectors.PREV_PANE).length) {
+                    throw new Error('Default structure option will generate its own `<button class="navitron__prev-pane" />`. Please remove the button from the markup or set structure option to `true` if you want control over the markup');
+                }
             }
 
             // Add nested container that will hold all nested level panes
@@ -116,12 +280,12 @@
             this.$navitron.removeAttr('hidden');
         },
 
-        _buildNestedLevels: function ($listItems, $nestedContainer) {
+        _buildNestedLevels: function($listItems, $nestedContainer) {
             var plugin = this;
 
-            var $pane = $('<div />').addClass('navitron__pane');
-            var $wrapper = $('<div />').addClass('navitron__wrapper');
-            var $button = $('<button type="button" />').addClass('navitron__item');
+            var $pane = $(template.PANE);
+            var $wrapper = $(template.WRAPPER);
+            var $button = $(template.BUTTON);
 
             $listItems.each(function (index, item) {
                 var $item = $(item);
@@ -164,7 +328,7 @@
                                 .attr('data-target-pane', targetLevel)
                                 .attr('data-current-pane', level);
 
-                        $prevButton.wrap('<div class="navitron__header" />').parent().insertBefore($nestedList);
+                        $(template.HEADER).append($prevButton).insertBefore($nestedList);
 
                         // Build next level button
                         var text = $item.text().trim();
@@ -187,7 +351,7 @@
             });
         },
 
-        _includeCustomMarkup: function ($list, level, targetLevel) {
+        _includeCustomMarkup: function($list, level, targetLevel) {
             var $header = $list.children('.navitron__header').remove();
             var $footer = $list.children('.navitron__footer').remove();
 
@@ -206,7 +370,7 @@
             return $list;
         },
 
-        _buildHeaderFooter: function ($element, targetLevel, level) {
+        _buildHeaderFooter: function($element, targetLevel, level) {
             var attrName;
             var attrValue;
             var attrs = '';
@@ -233,105 +397,6 @@
             $element.contents().appendTo($newContainer);
 
             return $newContainer;
-        },
-
-        _getParentLevel: function (level) {
-            var levelParts = level.toString().split('.');
-
-            // Pop Off the current id
-            levelParts.pop();
-
-            return levelParts.join('.');
-        },
-
-        _setLevelData: function() {
-            var $topLevel = this.$original.children('ul');
-            var selector = '> li > ul ';
-            var categoryId;
-
-            // Set root data-level to 0
-            $topLevel.attr('data-level', '0');
-
-            while (true) {
-                var $nestedLists = $topLevel.find(selector);
-                var refreshIndex = 0;
-
-                if ($nestedLists.length) {
-                    $nestedLists.each(function (index, item) {
-                        var $nestedList = $(item);
-
-                        // Grabbing ul parent
-                        var $parent = $nestedList.parents('ul').first();
-                        var dataLevel = $parent.data('level');
-
-                        // Check if we have moved onto a different Category
-                        // We 'reset' the index so nested items always start at 0 and onwards
-                        var level = parseInt(dataLevel.toString().split('.').pop());
-                        if (level !== categoryId) {
-                            categoryId = level;
-                            refreshIndex = 0;
-                        }
-
-                        // Set data-level to each nested list
-                        $nestedList.attr('data-level', dataLevel + '.' + refreshIndex);
-
-                        refreshIndex++;
-                    }); // jshint ignore:line
-
-                    selector += '> li > ul';
-                } else {
-                    break;
-                }
-            }
-        },
-
-        /**
-         * Ensure Navitron markup gets accessibility attributes
-         *
-         * [Reference] ARIA Treeview with aria-owns - http://oaa-accessibility.org/example/42/
-         */
-        _addAccessibility: function() {
-            this.$navitron.attr('role', 'tree');
-
-            this.$navitron.find(selectors.PANE)
-                .attr('aria-hidden', 'false');
-
-            this.$navitron.find(selectors.NESTED_PANE).each(function(idx, el) {
-                var $el = $(el);
-                var levelId = $el.data('level');
-
-                // Prefixing ID with 'Navitron_' to ensure we don't set a duplicate client ID accidentally
-                $el
-                    .attr('role', 'group')
-                    .attr('aria-hidden', 'true')
-                    .attr('id', 'Navitron_' + levelId);
-            });
-
-            this.$navitron.find(selectors.ITEM)
-                .attr('role', 'treeitem');
-
-            this.$navitron.find(selectors.NEXT_PANE).each(function(idx, el) {
-                var $el = $(el);
-                var targetId = $el.data('target-pane');
-
-                $el
-                    .attr('aria-expanded', 'false')
-                    .attr('aria-owns', 'Navitron_' + targetId);
-            });
-        },
-
-        _validateOptions: function() {
-            if (this.options.fadeOpacityTo < 0 || this.options.fadeOpacityTo > 1) {
-                throw new Error('The fadeOpacityTo value should be in the range from 0 to 1.0.');
-            }
-        },
-
-        _setAnimationDefaults: function() {
-            this.animationDefaults = {
-                easing: this.options.easing,
-                duration: this.options.duration,
-                mobileHA: true
-            };
         },
 
         _bindEvents: function() {
@@ -447,155 +512,75 @@
             }
         },
 
-        showPane: function($pane) {
-            if (!$pane.length) {
-                throw new Error('The showPane method requires a pane element to show');
-            }
-
-            // CSOPS-1332: This is to enforce only one pane to animate at a time
-            if (this.$navitron.hasClass(cssClasses.ANIMATING)) {
-                return;
-            }
-
-            var plugin = this;
-            var $shiftMenu = this.$currentPane;
-            var translateValue = this._getTranslateX($shiftMenu);
-
-            Velocity.animate(
-                $pane,
-                { translateX: ['-100%', 0] },
-                $.extend(true, {}, this.animationDefaults, {
-                    display: 'block',
-                    begin: function() {
-                        // CSOPS-1332: This is to enforce only one pane to animate at a time
-                        plugin.$navitron.addClass(cssClasses.ANIMATING);
-
-                        plugin._trigger('onShow', { pane: $pane });
-                    },
-                    complete: function() {
-                        // Complete callback function actually gets called BEFORE animation finishes
-                        // animating. Performing these functions at this point would causing
-                        // jank in the animation. We'll use requestAnimationFrame to queue up these
-                        // functions after animation has ended.
-                        window.requestAnimationFrame(function() {
-                            // CSOPS-1332: This is to enforce only one pane to animate at a time
-                            plugin.$navitron.removeClass(cssClasses.ANIMATING);
-
-                            $pane.attr('aria-hidden', 'false');
-
-                            plugin._setCurrentPane($pane);
-
-                            // Keyboard navigation
-                            plugin.setFocusableItems($pane);
-
-                            // Send focus to <ul> list
-                            $pane.find(selectors.CONTENT).attr('tabindex', 0).focus();
-
-                            plugin._trigger('onShown', { pane: $pane });
-                        });
-                    }
-                })
-            );
-
-            Velocity.animate(
-                $shiftMenu,
-                {
-                    translateX: [(translateValue - this.options.shiftAmount) + '%', translateValue + '%'],
-                    opacity: [this.options.fadeOpacityTo, 1]
-                },
-                $.extend(true, {}, this.animationDefaults, {
-                    display: 'none',
-                    complete: function() {
-                        $shiftMenu.attr('aria-hidden', 'true');
-                    }
-                }),
-                {queue: false}
-            );
-        },
-
-        _hidePane: function($pane, $button) {
-            var plugin = this;
-
-            // CSOPS-1332: This is to enforce only one pane to animate at a time
-            if (this.$navitron.hasClass(cssClasses.ANIMATING)) {
-                return;
-            }
-
-            Velocity.animate(
-                $pane,
-                {
-                    translateX: [0, '-100%']
-                },
-                $.extend(true, {}, this.animationDefaults, {
-                    display: 'none',
-                    complete: function() {
-                        $pane.attr('aria-hidden', 'true');
-                    }
-                })
-            );
-
-            // Shift in current Level
-            plugin._showPreviousPane($button);
-        },
-
-        _showPreviousPane: function($button) {
-            var plugin = this;
-            var buttonProperties = $button.data();
-            var $targetPane = this._getTargetPane(buttonProperties.targetPane);
-            var translateValue = this._getTranslateX($targetPane);
-
-            // If user calls 'showPane' method on a targeted pane. The
-            // previous pane wouldn't have any translateX value set, we'll
-            // have to set the translateValue manually.
-            if ($targetPane.attr('style').length < 1) {
-                translateValue = -(100 + this.options.shiftAmount);
-            }
-
-            Velocity.animate(
-                $targetPane,
-                {
-                    translateX: [(translateValue + this.options.shiftAmount) + '%', translateValue + '%'],
-                    opacity: [1, this.options.fadeOpacityTo]
-                },
-                $.extend(true, {}, this.animationDefaults, {
-                    display: 'block',
-                    begin: function() {
-                        // CSOPS-1332: This is to enforce only one pane to animate at a time
-                        plugin.$navitron.addClass(cssClasses.ANIMATING);
-
-                        plugin._trigger('onShow', { pane: $targetPane });
-                    },
-                    complete: function() {
-                        window.requestAnimationFrame(function() {
-                            // CSOPS-1332: This is to enforce only one pane to animate at a time
-                            plugin.$navitron.removeClass(cssClasses.ANIMATING);
-
-                            // Send focus back to parent menu item
-                            $targetPane
-                                .attr('aria-hidden', 'false')
-                                .find(selectors.NEXT_PANE + '[data-target-pane="' + buttonProperties.currentPane + '"]')
-                                .attr('aria-expanded', 'false')
-                                .focus();
-
-                            plugin._setCurrentPane($targetPane);
-
-                            plugin._trigger('onShown', { pane: $targetPane });
-
-                            // Setting new controllable items for keyboard navigation
-                            plugin.setFocusableItems($targetPane);
-                        });
-                    }
-                })
-            );
-        },
-
         setFocusableItems: function($pane) {
             // Exposing this method for cases when menu items gets Ajax'd in.
             this.$visibleItems = $pane.find(selectors.ITEM);
         },
 
-        _setCurrentPane: function ($pane) {
+        _setCurrentPane: function($pane) {
             this.$currentPane = $pane;
+        },
+
+        _setLevelData: function() {
+            var $topLevel = this.$original.children('ul');
+            var selector = '> li > ul ';
+            var categoryId;
+
+            // Set root data-level to 0
+            $topLevel.attr('data-level', '0');
+
+            while (true) {
+                var $nestedLists = $topLevel.find(selector);
+                var refreshIndex = 0;
+
+                if ($nestedLists.length) {
+                    $nestedLists.each(function (index, item) {
+                        var $nestedList = $(item);
+
+                        // Grabbing ul parent
+                        var $parent = $nestedList.parents('ul').first();
+                        var dataLevel = $parent.data('level');
+
+                        // Check if we have moved onto a different Category
+                        // We 'reset' the index so nested items always start at 0 and onwards
+                        var level = parseInt(dataLevel.toString().split('.').pop());
+                        if (level !== categoryId) {
+                            categoryId = level;
+                            refreshIndex = 0;
+                        }
+
+                        // Set data-level to each nested list
+                        $nestedList.attr('data-level', dataLevel + '.' + refreshIndex);
+
+                        refreshIndex++;
+                    }); // jshint ignore:line
+
+                    selector += '> li > ul';
+                } else {
+                    break;
+                }
+            }
+        },
+
+        _setAnimationDefaults: function() {
+            this.animationDefaults = {
+                easing: this.options.easing,
+                duration: this.options.duration,
+                mobileHA: true
+            };
+        },
+
+        _isAnimating: function() {
+            return this.$navitron.hasClass(cssClasses.ANIMATING);
+        },
+
+        _getParentLevel: function(level) {
+            var levelParts = level.toString().split('.');
+
+            // Pop Off the current id
+            levelParts.pop();
+
+            return levelParts.join('.');
         },
 
         _getTargetPane: function(pane) {
@@ -604,6 +589,53 @@
 
         _getTranslateX: function($element) {
             return parseFloat(Velocity.CSS.getPropertyValue($element[0], 'translateX'));
+        },
+
+        /**
+         * Ensure Navitron markup gets accessibility attributes
+         *
+         * [Reference] ARIA Treeview with aria-owns - http://oaa-accessibility.org/example/42/
+         */
+        _addAccessibility: function() {
+            this.$navitron.attr('role', 'tree');
+
+            this.$navitron.find(selectors.PANE)
+                .attr('aria-hidden', 'false');
+
+            this.$navitron.find(selectors.NESTED_PANE).each(function(idx, el) {
+                var $el = $(el);
+                var levelId = $el.data('level');
+
+                // Prefixing ID with 'Navitron_' to ensure we don't set a duplicate client ID accidentally
+                $el
+                    .attr('role', 'group')
+                    .attr('aria-hidden', 'true')
+                    .attr('id', 'Navitron_' + levelId);
+            });
+
+            this.$navitron.find(selectors.ITEM)
+                .attr('role', 'treeitem');
+
+            this.$navitron.find(selectors.NEXT_PANE).each(function(idx, el) {
+                var $el = $(el);
+                var targetId = $el.data('target-pane');
+
+                $el
+                    .attr('aria-expanded', 'false')
+                    .attr('aria-owns', 'Navitron_' + targetId);
+            });
+        },
+
+        _validateOptions: function() {
+            if (this.options.fadeOpacityTo < 0 || this.options.fadeOpacityTo > 1) {
+                throw new Error('The fadeOpacityTo option value should be in the range from 0 to 1.0.');
+            }
+            if (isNaN(this.options.shiftAmount)) {
+                throw new Error('The shiftAmount option value needs to be an integer.');
+            }
+            if (this.options.shiftAmount < 0 || this.options.shiftAmount > 100) {
+                throw new Error('The shiftAmount option value should be in the range from 0 to 100.');
+            }
         }
     });
 

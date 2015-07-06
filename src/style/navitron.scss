@@ -70,8 +70,8 @@
 // Notes:
 //
 // 1. Avoid content bleed through.
-// 2. [CSOPS-1371] Fix repaint issues on Android 4.1
-// 3. [CSOPS-1371] We'll only show the shadows during pane animations.
+// 2. Fix repaint issues on Android 4.1
+// 3. We'll only show the shadows during pane animations.
 //    Legacy Android browsers (4.0 - 4.1) have problems rendering position
 //    absolute + overflow + box-shadow. However the Android rendering
 //    bug isn't quite noticable during pane animation, so it should

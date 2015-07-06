@@ -57,7 +57,7 @@ define([
                     navitron = new Navitron($element, {
                         fadeOpacityTo: 2.0
                     });
-                }).to.throw('The fadeOpacityTo value should be in the range from 0 to 1.0.');
+                }).to.throw('The fadeOpacityTo option value should be in the range from 0 to 1.0.');
             });
         });
 
