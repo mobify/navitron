@@ -127,12 +127,12 @@
             if (plugin.options.slideDirection === 'left') {
                 directionValue = '100%';
 
-                plugin.panePosition = '-100%';
+                plugin.oppositePanePosition = '-100%';
                 plugin.shiftValue = this.options.shiftAmount;
             } else if (plugin.options.slideDirection === 'right') {
                 directionValue = '-100%';
 
-                plugin.panePosition = '100%';
+                plugin.oppositePanePosition = '100%';
                 plugin.shiftValue = 0;
             }
 
@@ -494,7 +494,7 @@
 
             Velocity.animate(
                 $pane,
-                { translateX: [plugin.panePosition, 0] },
+                { translateX: [plugin.oppositePanePosition, 0] },
                 $.extend(true, {}, this.animationDefaults, {
                     display: 'block',
                     begin: function() {
@@ -555,7 +555,7 @@
             Velocity.animate(
                 $pane,
                 {
-                    translateX: [0, plugin.panePosition]
+                    translateX: [0, plugin.oppositePanePosition]
                 },
                 $.extend(true, {}, this.animationDefaults, {
                     display: 'none',
