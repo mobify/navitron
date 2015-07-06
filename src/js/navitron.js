@@ -67,7 +67,6 @@
 
         _build: function() {
             var plugin = this;
-            var directionValue;
 
             var $navitron = this.$original.addClass('navitron');
             var $nestedContainer = $('<div />').addClass('navitron__nested');
@@ -99,20 +98,7 @@
                 plugin._includeCustomMarkup($topLevelList);
             }
 
-            // // Change direction variable
-            if (plugin.options.slideDirection === 'left') {
-                directionValue = '100%';
-            } else if (this.options.slideDirection === 'right') {
-                directionValue = '-100%';
-            } else {
-                directionValue = '100%';
-            }
-
-            // Give style for slide direction
-            $nestedContainer.css({
-                '-webkit-transform': 'translate3d(' + directionValue + ', 0, 0)',
-                'transform': 'translate3d(' + directionValue + ', 0, 0)'
-            });
+            this._setDirection($nestedContainer);
 
             // Add nested container that will hold all nested level panes
             $nestedContainer.appendTo($navitron);
@@ -131,6 +117,30 @@
 
             // Reveal navitron now that it has finished building
             this.$navitron.removeAttr('hidden');
+        },
+
+        _setDirection: function($nestedContainer) {
+            var plugin = this;
+            var directionValue;
+
+            // Change direction variable
+            if (plugin.options.slideDirection === 'left') {
+                directionValue = '100%';
+
+                plugin.panePosition = '-100%';
+                plugin.shiftValue = this.options.shiftAmount;
+            } else if (plugin.options.slideDirection === 'right') {
+                directionValue = '-100%';
+
+                plugin.panePosition = '100%';
+                plugin.shiftValue = 0;
+            }
+
+            // Give style for slide direction
+            $nestedContainer.css({
+                '-webkit-transform': 'translate3d(' + directionValue + ', 0, 0)',
+                'transform': 'translate3d(' + directionValue + ', 0, 0)'
+            });
         },
 
         _buildNestedLevels: function ($listItems, $nestedContainer) {
@@ -341,6 +351,10 @@
             if (this.options.fadeOpacityTo < 0 || this.options.fadeOpacityTo > 1) {
                 throw new Error('The fadeOpacityTo value should be in the range from 0 to 1.0.');
             }
+
+            if (this.options.slideDirection !== 'left' && this.options.slideDirection !== 'right') {
+                throw new Error('The slideDirection should be set to left or right.');
+            }
         },
 
         _setAnimationDefaults: function() {
@@ -475,32 +489,12 @@
             }
 
             var plugin = this;
-            var directionOppositeValue;
             var $shiftMenu = this.$currentPane;
             var translateValue = this._getTranslateX($shiftMenu);
 
-            var slideLeft = '-100%';
-            var slideRight = '100%';
-
-            var shiftValue;
-
-            // Change direction variable
-            if (plugin.options.slideDirection === 'left') {
-                directionOppositeValue = slideLeft;
-
-                shiftValue = this.options.shiftAmount;
-
-            } else if (this.options.slideDirection === 'right') {
-                directionOppositeValue = slideRight;
-
-                shiftValue = 0;
-            } else  {
-                directionOppositeValue = slideLeft;
-            }
-
             Velocity.animate(
                 $pane,
-                { translateX: [directionOppositeValue, 0] },
+                { translateX: [plugin.panePosition, 0] },
                 $.extend(true, {}, this.animationDefaults, {
                     display: 'block',
                     begin: function() {
@@ -537,7 +531,7 @@
             Velocity.animate(
                 $shiftMenu,
                 {
-                    translateX: [(translateValue - shiftValue) + '%', translateValue + '%'],
+                    translateX: [(translateValue - plugin.shiftValue) + '%', translateValue + '%'],
                     opacity: [this.options.fadeOpacityTo, 1]
                 },
                 $.extend(true, {}, this.animationDefaults, {
@@ -552,28 +546,16 @@
 
         _hidePane: function($pane, $button) {
             var plugin = this;
-            var directionOppositeValue;
-            var slideLeft = '-100%';
-            var slideRight = '100%';
 
             // CSOPS-1332: This is to enforce only one pane to animate at a time
             if (this.$navitron.hasClass(cssClasses.ANIMATING)) {
                 return;
             }
 
-            // Change direction variable
-            if (plugin.options.slideDirection === 'left') {
-                directionOppositeValue = slideLeft;
-            } else if (this.options.slideDirection === 'right') {
-                directionOppositeValue = slideRight;
-            } else  {
-                directionOppositeValue = slideLeft;
-            }
-
             Velocity.animate(
                 $pane,
                 {
-                    translateX: [0, directionOppositeValue]
+                    translateX: [0, plugin.panePosition]
                 },
                 $.extend(true, {}, this.animationDefaults, {
                     display: 'none',
@@ -592,34 +574,18 @@
             var buttonProperties = $button.data();
             var $targetPane = this._getTargetPane(buttonProperties.targetPane);
             var translateValue = this._getTranslateX($targetPane);
-            var slideLeft = '-100%';
-            var slideRight = '100%';
-            var shiftValue;
-
-            // Change direction variable
-            if (plugin.options.slideDirection === 'left') {
-                directionOppositeValue = slideLeft;
-
-                shiftValue = this.options.shiftAmount;
-            } else if (this.options.slideDirection === 'right') {
-                directionOppositeValue = slideRight;
-
-                shiftValue = 0;
-            } else  {
-                directionOppositeValue = slideLeft;
-            }
 
             // If user calls 'showPane' method on a targeted pane. The
             // previous pane wouldn't have any translateX value set, we'll
             // have to set the translateValue manually.
             if ($targetPane.attr('style').length < 1) {
-                translateValue = -(100 + shiftValue);
+                translateValue = -(100 + plugin.shiftValue);
             }
 
             Velocity.animate(
                 $targetPane,
                 {
-                    translateX: [(translateValue + shiftValue) + '%', translateValue + '%'],
+                    translateX: [(translateValue + plugin.shiftValue) + '%', translateValue + '%'],
                     opacity: [1, this.options.fadeOpacityTo]
                 },
                 $.extend(true, {}, this.animationDefaults, {
