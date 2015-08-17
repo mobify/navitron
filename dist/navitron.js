@@ -505,9 +505,15 @@
                 e.preventDefault();
             }
 
-            // Down arrow: End of list, send focus to back button
+            // Up arrow: Start of list, send focus to last navitron item
+            if (e.which === 38 && itemIndex === 0) {
+                this.$visibleItems.filter(selectors.ITEM).last().focus();
+                e.preventDefault();
+            }
+
+            // Down arrow: End of list, send focus to first navitron item
             if (e.which === 40 && focusableItemsCount === itemIndex) {
-                this.$visibleItems.filter(selectors.PREV_PANE).focus();
+                this.$visibleItems.filter(selectors.ITEM).eq(0).focus();
                 e.preventDefault();
             }
         },
