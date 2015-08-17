@@ -126,7 +126,7 @@ $('#myNavitron').navitron({
     duration: 200,
     easing: 'swing',
     fadeOpacityTo: 0.25,
-    structure: false,
+    structure: true,
     onShow: noop,
     onShown: noop
 });
@@ -196,13 +196,13 @@ $('#myNavitron').navitron({
 
 ##### structure
 
-default: `false`
+default: `true`
 
 Defines the structure to use for Navitron panes. By default, Navitron will automatically add a `Back` button to `.navitron__header` for each nested list.
 
-**If you want to have full control over the header and footer section of the Navitron panes, set `structure: true`**.
+**If you want to have full control over the header and footer section of the Navitron panes, set `structure: false`**.
 
-If you are using `structure: true`, you will need to structure your HTML to include the following elements shown below. *You must include `<button class="navitron__next-pane">` for each list item that have a nested list inside. In addition, you must have `<button class="navitron__prev-pane">` either in `<li class="navitron__header">`* **OR** *`<li class="navitron__footer">` for each nested list.* Navitron will transform the `<li>` into a `<div>` perserving all the class names, ID, attributes that you might have included and all of the contents inside would be kept during the transformation process.
+If you are using `structure: false`, you will need to structure your HTML to include the following elements shown below. *You must include `<button class="navitron__next-pane">` for each list item that have a nested list inside. In addition, you must have `<button class="navitron__prev-pane">` either in `<li class="navitron__header">`* **OR** *`<li class="navitron__footer">` for each nested list.* Navitron will transform the `<li>` into a `<div>` perserving all the class names, ID, attributes that you might have included and all of the contents inside would be kept during the transformation process.
 
 **Missing any elements will cause Navitron to not function properly.**
 

@@ -53,7 +53,7 @@
         duration: 200,
         easing: 'swing',
         fadeOpacityTo: 0.25,
-        structure: false,
+        structure: true,
         onShow: $.noop,
         onShown: $.noop
     };
@@ -253,11 +253,11 @@
                 );
 
             // Custom markup for top level
-            if (plugin.options.structure) {
+            if (!plugin.options.structure) {
                 plugin._includeCustomMarkup($topLevelList);
             } else {
                 if ($navitron.find(selectors.PREV_PANE).length) {
-                    throw new Error('Default structure option will generate its own `<button class="navitron__prev-pane" />`. Please remove the button from the markup or set structure option to `true` if you want control over the markup');
+                    throw new Error('Default structure option will generate its own `<button class="navitron__prev-pane" />`. Please remove the button from the markup or set structure option to `false` if you want control over the markup');
                 }
             }
 
@@ -310,7 +310,7 @@
                         .appendTo($nestedContainer);
 
                     // Custom markup
-                    if (plugin.options.structure) {
+                    if (!plugin.options.structure) {
                         plugin._includeCustomMarkup($nestedList, level, targetLevel);
 
                         // Next level button
