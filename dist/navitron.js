@@ -16,17 +16,22 @@
         ITEM: '.navitron__item',
         NEXT_PANE: '.navitron__next-pane',
         PREV_PANE: '.navitron__prev-pane',
-        CONTENT: '.navitron__content'
+        HEADER: '.navitron__header',
+        CONTENT: '.navitron__content',
+        FOOTER: '.navitron__footer'
     };
 
     var cssClasses = {
+        NAVITRON: 'navitron',
         ANIMATING: 'navitron--is-animating',
         NESTED_CONTAINER: 'navitron__nested',
         PANE: 'navitron__pane',
         WRAPPER: 'navitron__wrapper',
         HEADER: 'navitron__header',
+        CONTENT: 'navitron__content',
         FOOTER: 'navitron__footer',
         NEXT_PANE: 'navitron__next-pane',
+        PREV_PANE: 'navitron__prev-pane',
         ITEM: 'navitron__item'
     };
 
@@ -38,6 +43,7 @@
         PANE: '<div class="' + cssClasses.PANE + '"></div>',
         WRAPPER: '<div class="' + cssClasses.WRAPPER + '"></div>',
         HEADER: '<div class="' + cssClasses.HEADER + '"></div>',
+        CONTENT: '<div class="' + cssClasses.CONTENT + '"></div>',
         FOOTER: '<div class="' + cssClasses.FOOTER + '"></div>',
         BUTTON: '<button type="button" class="' + cssClasses.ITEM + '"></button>',
     };
@@ -227,10 +233,11 @@
         _build: function() {
             var plugin = this;
 
-            var $navitron = this.$original.addClass('navitron');
+            var $navitron = this.$original.addClass(cssClasses.NAVITRON);
             var $nestedContainer = $(template.NESTED_CONTAINER);
             var $pane = $(template.PANE);
             var $wrapper = $(template.WRAPPER);
+            var $content = $(template.CONTENT);
             var $button = $(template.BUTTON);
             var $topLevelList = $navitron.children('ul');
             var $listItems = $topLevelList.children('li');
@@ -244,7 +251,8 @@
 
             // Build top level markup
             $navitron.children('ul')
-                .addClass('navitron__content')
+                .wrap($content.clone())
+                .parent()
                 .wrap($wrapper.clone())
                 .parent()
                 .wrap(
@@ -268,7 +276,7 @@
             this._buildNestedLevels($listItems, $nestedContainer);
 
             // Item class for ARIA accessibility decorate function
-            $navitron.find('button, a').addClass('navitron__item');
+            $navitron.find('button, a').addClass(cssClasses.ITEM);
 
             // Redefine Navitron to the new wrapper we created
             this.$navitron = $navitron;
@@ -285,11 +293,12 @@
 
             var $pane = $(template.PANE);
             var $wrapper = $(template.WRAPPER);
+            var $content = $(template.CONTENT);
             var $button = $(template.BUTTON);
 
             $listItems.each(function (index, item) {
                 var $item = $(item);
-                var $nestedList = $item.children('ul').addClass('navitron__content').remove();
+                var $nestedList = $item.children('ul').remove();
 
                 // If there's nested <ul> run _buildNestedLevels function again
                 if ($nestedList.length) {
@@ -302,6 +311,8 @@
 
                     // Put nested levels into nested container
                     $nestedList
+                        .wrapAll($content.clone())
+                        .parent()
                         .wrap($wrapper.clone())
                         .parent()
                         .wrap($pane.clone())
@@ -314,9 +325,9 @@
                         plugin._includeCustomMarkup($nestedList, level, targetLevel);
 
                         // Next level button
-                        if ($item.find('.navitron__next-pane').length) {
-                            $item.find('.navitron__next-pane')
-                                .addClass('navitron__item')
+                        if ($item.find(selectors.NEXT_PANE).length) {
+                            $item.find(selectors.NEXT_PANE)
+                                .addClass(cssClasses.ITEM)
                                 .attr('data-target-pane', level);
                         } else {
                             throw new Error('Custom structure requires element with class "navitron__next-pane" for nested lists');
@@ -324,11 +335,11 @@
                     } else {
                         var $prevButton = $button.clone()
                                 .text('Back')
-                                .addClass('navitron__prev-pane')
+                                .addClass(cssClasses.PREV_PANE)
                                 .attr('data-target-pane', targetLevel)
                                 .attr('data-current-pane', level);
 
-                        $(template.HEADER).append($prevButton).insertBefore($nestedList);
+                        $(template.HEADER).append($prevButton).insertBefore($nestedList.parent(selectors.CONTENT));
 
                         // Build next level button
                         var text = $item.text().trim();
@@ -337,7 +348,7 @@
                             $button.clone()
                                 .text(text)
                                 .attr('data-target-pane', level)
-                                .addClass('navitron__next-pane')
+                                .addClass(cssClasses.NEXT_PANE)
                         );
                     }
 
@@ -352,19 +363,19 @@
         },
 
         _includeCustomMarkup: function($list, level, targetLevel) {
-            var $header = $list.children('.navitron__header').remove();
-            var $footer = $list.children('.navitron__footer').remove();
+            var $header = $list.children(selectors.HEADER).remove();
+            var $footer = $list.children(selectors.FOOTER).remove();
 
             if ($header.length) {
                 var $headerContainer = this._buildHeaderFooter($header, targetLevel, level);
 
-                $headerContainer.insertBefore($list);
+                $headerContainer.insertBefore($list.parent(selectors.CONTENT));
             }
 
             if ($footer.length) {
                 var $footerContainer = this._buildHeaderFooter($footer, targetLevel, level);
 
-                $footerContainer.insertAfter($list);
+                $footerContainer.insertAfter($list.parent(selectors.CONTENT));
             }
 
             return $list;
@@ -375,7 +386,7 @@
             var attrValue;
             var attrs = '';
             var attributeLength = $element[0].attributes.length;
-            var $backButton = $element.find('.navitron__prev-pane');
+            var $backButton = $element.find(selectors.PREV_PANE);
 
             // Perserve original attributes (classes, ID, etc)
             for (var i = 0; i < attributeLength; i++) {
@@ -389,7 +400,7 @@
 
             if ($backButton.length) {
                 $backButton
-                    .addClass('navitron__item')
+                    .addClass(cssClasses.ITEM)
                     .attr('data-target-pane', targetLevel)
                     .attr('data-current-pane', level);
             }
