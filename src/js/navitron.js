@@ -298,19 +298,20 @@
 
             $listItems.each(function (index, item) {
                 var $item = $(item);
-                var $nestedList = $item.children('ul').remove();
+                var $nestedList = $item.children('ul');
 
                 // If there's nested <ul> run _buildNestedLevels function again
                 if ($nestedList.length) {
                     // Get level data
                     var level = $nestedList.data('level');
                     var targetLevel = plugin._getParentLevel(level);
+                    var $contents = $item.contents().not(selectors.NEXT_PANE);
 
                     // Clean up markup
                     $nestedList.removeAttr('data-level');
 
                     // Put nested levels into nested container
-                    $nestedList
+                    $contents
                         .wrapAll($content.clone())
                         .parent()
                         .wrap($wrapper.clone())
