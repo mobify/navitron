@@ -5,6 +5,7 @@ define([
     var Navitron;
     var $element;
     var $;
+    var $nestedPane;
 
     describe('Navitron events', function() {
         beforeEach(function(done) {
@@ -17,6 +18,34 @@ define([
             };
 
             testSandbox.setUp('sandbox', setUpComplete);
+        });
+
+        it('fires the onShow event before navitron pane slides in', function(done) {
+            console.info($element);
+
+            $element.navitron({
+                onShow: function() {
+                    done();
+                }
+            });
+
+            var $nestedPane = $element.find('.navitron__nested .navitron__pane').first();
+
+            $element.navitron('showPane', $nestedPane);
+        });
+
+        it('fires the onShown event after navitron pane is slid in', function(done) {
+            console.info($element);
+
+            $element.navitron({
+                onShown: function() {
+                    done();
+                }
+            });
+
+            var $nestedPane = $element.find('.navitron__nested .navitron__pane').first();
+
+            $element.navitron('showPane', $nestedPane);
         });
     });
 });
