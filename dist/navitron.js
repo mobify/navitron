@@ -108,10 +108,12 @@
                 $.extend(true, {}, this.animationDefaults, {
                     display: 'block',
                     begin: function() {
-                        // Enforce only one pane to animate at a time
-                        plugin.$navitron.addClass(cssClasses.ANIMATING);
+                        window.requestAnimationFrame(function() {
+                            // Enforce only one pane to animate at a time
+                            plugin.$navitron.addClass(cssClasses.ANIMATING);
 
-                        plugin._trigger('onShow', { pane: $pane });
+                            plugin._trigger('onShow', { pane: $pane });
+                        });
                     },
                     complete: function() {
                         // Complete callback function actually gets called BEFORE animation finishes
@@ -147,10 +149,11 @@
                 $.extend(true, {}, this.animationDefaults, {
                     display: 'none',
                     complete: function() {
-                        $shiftMenu.attr('aria-hidden', 'true');
+                        window.requestAnimationFrame(function() {
+                            $shiftMenu.attr('aria-hidden', 'true');
+                        });
                     }
-                }),
-                {queue: false}
+                })
             );
         },
 
@@ -170,7 +173,9 @@
                 $.extend(true, {}, this.animationDefaults, {
                     display: 'none',
                     complete: function() {
-                        $pane.attr('aria-hidden', 'true');
+                        window.requestAnimationFrame(function() {
+                            $pane.attr('aria-hidden', 'true');
+                        });
                     }
                 })
             );
@@ -201,10 +206,12 @@
                 $.extend(true, {}, this.animationDefaults, {
                     display: 'block',
                     begin: function() {
-                        // Enforce only one pane to animate at a time
-                        plugin.$navitron.addClass(cssClasses.ANIMATING);
+                        window.requestAnimationFrame(function() {
+                            // Enforce only one pane to animate at a time
+                            plugin.$navitron.addClass(cssClasses.ANIMATING);
 
-                        plugin._trigger('onShow', { pane: $targetPane });
+                            plugin._trigger('onShow', { pane: $targetPane });
+                        });
                     },
                     complete: function() {
                         window.requestAnimationFrame(function() {
@@ -250,7 +257,7 @@
             $topLevelList.removeAttr('data-level'); // Remove the data-level set by label tree function
 
             // Build top level markup
-            $navitron.children('ul')
+            $topLevelList
                 .wrap($content.clone())
                 .parent()
                 .wrap($wrapper.clone())
@@ -305,7 +312,7 @@
                     // Get level data
                     var level = $nestedList.data('level');
                     var targetLevel = plugin._getParentLevel(level);
-                    var $contents = $item.contents().not(selectors.NEXT_PANE);
+                    var $contents = $item.contents().not($(selectors.NEXT_PANE));
 
                     // Clean up markup
                     $nestedList.removeAttr('data-level');
