@@ -258,7 +258,7 @@
 
             // Build top level markup
             $topLevelList
-                .wrap($content.clone())
+                .wrapAll($content.clone())
                 .parent()
                 .wrap($wrapper.clone())
                 .parent()
