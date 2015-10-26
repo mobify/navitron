@@ -14,164 +14,82 @@
     <link rel="stylesheet" href="assets/css/examples.css">
 </head>
 <body>
-    <h1>Navitron Example</h1>
+    <div class="site-pane">
+        <div class="site-header">Fixed site header</div>
 
-    <nav id="myNavitron" hidden>
-        <ul>
-            <li class="navitron__header" id="testing2" value="12">
-                <div class="c-bar">
-                    <span class="c-bar__heading">Top Level</span>
-                </div>
-            </li>
-
-            <li>
-                <button class="navitron__next-pane" type="button">Men</button>
+        <form>
+            <nav id="myNavitron" hidden>
                 <ul>
                     <li class="navitron__header">
                         <div class="c-bar">
-                            <button class="c-button navitron__prev-pane" type="button">
-                                Back
-                            </button>
-                            <span class="c-bar__heading">Men</span>
+                            <span class="c-bar__heading">Top Level</span>
                         </div>
                     </li>
 
-                    <li>
-                        <button class="navitron__next-pane" type="button">Outerwear</button>
-                        <ul>
-                            <li><a href="#">Jacket</a></li>
-                            <li><a href="#">Parkas</a></li>
-                            <li><a href="#">Vests</a></li>
-                            <li class="navitron__footer">
-                                <div class="c-bar">
-                                    <button class="c-button navitron__prev-pane" type="button">
-                                        Back
-                                    </button>
-                                    <span class="c-bar__heading">Outerwear</span>
-                                </div>
-                            </li>
-                        </ul>
-                    </li>
+                    <div class="form">
+                        <div><select><option>Option 1</option></select></div>
+                        <div><select><option>Option 1</option></select></div>
+                        <div><select><option>Option 1</option></select></div>
+                        <div><select><option>Option 1</option></select></div>
+                        <div><select><option>Option 1</option></select></div>
+                        <div><select><option>Option 1</option></select></div>
+                        <div><select><option>Option 1</option></select></div>
+                        <div><select><option>Option 1</option></select></div>
+                        <div><select><option>Option 1</option></select></div>
+                        <div><select><option>Option 1</option></select></div>
+                    </div>
 
                     <li>
-                        <button class="navitron__next-pane" type="button">Shirts</button>
+                        <button class="navitron__next-pane" type="button">Men</button>
+
                         <ul>
                             <li class="navitron__header">
                                 <div class="c-bar">
                                     <button class="c-button navitron__prev-pane" type="button">
                                         Back
                                     </button>
-                                    <span class="c-bar__heading">Shirts</span>
+                                    <span class="c-bar__heading">Men</span>
                                 </div>
                             </li>
-                            <li><a href="#">Plain</a></li>
-                            <li><a href="#">Two Tone</a></li>
-                            <li><a href="#">Plaid</a></li>
-                        </ul>
-                    </li>
 
-                    <li>
-                        <button class="navitron__next-pane" type="button">Pants</button>
-                        <ul>
-                            <li class="navitron__header">
-                                <div class="c-bar">
-                                    <button class="c-button navitron__prev-pane" type="button">
-                                        Back
-                                    </button>
-                                    <span class="c-bar__heading">Pants</span>
-                                </div>
+                            <div class="form">
+                                <div><input type="text" /></div>
+                                <div><input type="text" /></div>
+                                <div><input type="text" /></div>
+                                <div><input type="text" /></div>
+                                <div><input type="text" /></div>
+                                <div><input type="text" /></div>
+                                <div><input type="text" /></div>
+                                <div><input type="text" /></div>
+                                <div><input type="text" /></div>
+                                <div><input type="text" /></div>
+                            </div>
+
+                            <li>
+                                <button class="navitron__next-pane" type="button">Outerwear</button>
+                                <ul>
+                                    <li class="navitron__header">
+                                        <div class="c-bar">
+                                            <button class="c-button navitron__prev-pane" type="button">
+                                                Back
+                                            </button>
+                                            <span class="c-bar__heading">Outerwear</span>
+                                        </div>
+                                    </li>
+                                    <li><a href="#">Jacket</a></li>
+                                    <li><a href="#">Parkas</a></li>
+                                    <li><a href="#">Vests</a></li>
+                                    <li><button class="js-back-to-first" type="button">Back to first step</button></li>
+                                </ul>
                             </li>
-                            <li><a href="#">Dress Pants</a></li>
-                            <li><a href="#">Jeans</a></li>
-                            <li><a href="#">Ski Pants</a></li>
                         </ul>
                     </li>
                 </ul>
-            </li>
+            </nav>
+        </form>
 
-            <li>
-                <button class="navitron__next-pane" type="button">Women</button>
-                <ul>
-                    <li class="navitron__header">
-                        <div class="c-bar">
-                            <button class="c-button navitron__prev-pane" type="button">
-                                Back
-                            </button>
-                            <span class="c-bar__heading">Women</span>
-                        </div>
-                    </li>
-                    <li>
-                        <a href="#">Tops</a>
-                    </li>
-
-                    <li>
-                        <a href="#">Dresses</a>
-                    </li>
-
-                    <li>
-                        <a href="#">Fleece</a>
-                    </li>
-                </ul>
-            </li>
-
-            <li><a href="#">Anchor Link</a></li>
-
-            <li><a href="#">Anchor Link</a></li>
-
-            <li><a href="#">Anchor Link</a></li>
-
-            <li><a href="#">Anchor Link</a></li>
-
-            <li><a href="#">Anchor Link</a></li>
-
-            <li><a href="#">Anchor Link</a></li>
-
-            <li>
-                <button class="navitron__next-pane" type="button">Gear</button>
-                <ul>
-                    <li class="navitron__header">
-                        <div class="c-bar">
-                            <button class="c-button navitron__prev-pane" type="button">
-                                Back
-                            </button>
-                            <span class="c-bar__heading">Gear</span>
-                        </div>
-                    </li>
-                    <li>
-                        <a href="#">Lighting</a>
-                    </li>
-
-                    <li>
-                        <a href="#">Tents</a>
-                    </li>
-
-                    <li>
-                        <a href="#">Backpacks</a>
-                    </li>
-                </ul>
-            </li>
-
-            <li class="navitron__footer">
-                <div class="c-bar">
-                    <span class="c-bar__heading">Footer</span>
-                </div>
-            </li>
-        </ul>
-        <ul>
-            <li>
-                <a href="#">Secondary menu link 1</a>
-            </li>
-            <li>
-                <a href="#">Secondary menu link 2</a>
-            </li>
-            <li>
-                <a href="#">Secondary menu link 3</a>
-            </li>
-            <li>
-                <a href="#">Secondary menu link 4</a>
-            </li>
-        </ul>
-    </nav>
+        <div class="site-footer">Fixed site footer</div>
+    </div>
 
     <script data-main="assets/js/main" src="../bower_components/requirejs/require.js"></script>
 </body>

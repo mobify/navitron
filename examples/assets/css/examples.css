@@ -18,10 +18,6 @@ li {
     padding: 0;
 }
 
-.navitron {
-    height: 400px;
-}
-
 .c-button {
     display: inline-block;
     width: auto;
@@ -56,4 +52,75 @@ li {
     flex: 1;
 
     text-align: center;
+}
+
+
+.site-pane {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: column;
+    flex-direction: column;
+}
+
+.site-header, .site-footer {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    -webkit-justify-content: center;
+    justify-content: center;
+    -webkit-box-flex: 0;
+    -webkit-flex: 0 0 auto;
+    flex: 0 0 auto;
+    min-height: 48px;
+}
+
+.site-header + form {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: column;
+    flex-direction: column;
+    -webkit-box-flex: 1;
+    -webkit-flex: 1 1 auto;
+    flex: 1 1 auto;
+}
+
+.navitron {
+    -webkit-box-flex: 1;
+    -webkit-flex: 1 1 auto;
+    flex: 1 1 auto;
+}
+
+input, select {
+    width: 100%;
+
+    background: #fff;
+
+    font-size: 16px;
+}
+
+select {
+    -webkit-appearance: none;
+}
+
+.form > div + div {
+    margin-top: 16px;
 }
