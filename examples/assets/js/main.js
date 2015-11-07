@@ -7,7 +7,7 @@ require(['config'], function() {
     function($) {
         $('#myNavitron').navitron({
             structure: false,
-            shiftAmount: 100
+            shiftAmount: 20
         });
     });
 });

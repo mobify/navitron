@@ -4,7 +4,6 @@
   min-height: 200px;
   background: white; }
 
-.navitron__nested,
 .navitron__pane {
   position: absolute;
   top: 0;
@@ -12,15 +11,10 @@
   right: 0;
   bottom: 0; }
 
-.navitron__nested {
-  -webkit-transform: translate3d(100%, 0, 0);
-          transform: translate3d(100%, 0, 0); }
-  .navitron__nested .navitron__pane {
-    display: none; }
-
 .navitron__pane {
   overflow-x: hidden;
   overflow-y: auto;
+  display: none;
   width: 100%;
   height: 100%;
   background: white;
@@ -30,6 +24,8 @@
           transform: translate3d(0, 0, 0);
   -webkit-overflow-scrolling: touch;
   -webkit-backface-visibility: hidden; }
+  .navitron__pane.navitron--current-pane {
+    display: block; }
   .navitron--is-animating .navitron__pane {
     -webkit-box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.8); }
