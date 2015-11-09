@@ -121,7 +121,7 @@
 
 .navitron__header,
 .navitron__footer {
-    flex-shrink: 0; // 1, 2
+    flex: 0 0 auto; // 1, 2
 }
 
 
@@ -140,7 +140,7 @@
 
 .navitron__content {
     overflow: auto;
-    flex: 1; // 1, 2
+    flex: 1 1 auto; // 1, 2
 
     -webkit-overflow-scrolling: touch;
 }

@@ -18,7 +18,8 @@
         PREV_PANE: '.navitron__prev-pane',
         HEADER: '.navitron__header',
         CONTENT: '.navitron__content',
-        FOOTER: '.navitron__footer'
+        FOOTER: '.navitron__footer',
+        CURRENT_PANE: '.navitron--current-pane'
     };
 
     var cssClasses = {
@@ -204,7 +205,6 @@
             var plugin = this;
 
             var $navitron = this.$original.addClass(cssClasses.NAVITRON);
-            // var $nestedContainer = $(template.NESTED_CONTAINER);
             var $pane = $(template.PANE);
             var $wrapper = $(template.WRAPPER);
             var $content = $(template.CONTENT);
@@ -240,11 +240,8 @@
                 }
             }
 
-            // Add nested container that will hold all nested level panes
-            // $nestedContainer.appendTo($navitron);
-
             // Build nested levels
-            this._buildNestedLevels($listItems, $navitron);
+            this._buildNestedLevels($listItems);
 
             // Item class for ARIA accessibility decorate function
             $navitron.find('button, a').addClass(cssClasses.ITEM);
@@ -259,7 +256,7 @@
             this.$navitron.removeAttr('hidden');
         },
 
-        _buildNestedLevels: function($listItems, $navitron) {
+        _buildNestedLevels: function($listItems) {
             var plugin = this;
 
             var $pane = $(template.PANE);
@@ -281,7 +278,7 @@
                     // Clean up markup
                     $nestedList.removeAttr('data-level');
 
-                    // Put nested levels into nested container
+                    // Put nested levels into Navitron container
                     $contents
                         .wrapAll($content.clone())
                         .parent()
@@ -290,7 +287,7 @@
                         .wrap($pane.clone())
                         .parent()
                         .attr('data-level', level)
-                        .appendTo($navitron);
+                        .appendTo(plugin.$original);
 
                     // Custom markup
                     if (!plugin.options.structure) {
@@ -328,7 +325,7 @@
                     var $listItems = $nestedList.children('li');
 
                     if ($listItems.length) {
-                        plugin._buildNestedLevels($listItems, $navitron);
+                        plugin._buildNestedLevels($listItems, plugin.$original);
                     }
                 }
             });
@@ -418,14 +415,11 @@
                 var buttonProperties = $button.data();
                 var $targetPane = plugin._getTargetPane(buttonProperties.targetPane);
 
-                // debugger;
+                // Set CSS classes for proper animation detection
                 plugin.$currentPane.removeClass(cssClasses.CURRENT_PANE)
                     .addClass(cssClasses.DISMISS_PANE);
 
                 plugin.showPane($targetPane);
-
-                // Slide out current level
-                // plugin._hidePane(plugin.$currentPane, $button);
             });
 
             /**
@@ -599,10 +593,7 @@
         _addAccessibility: function() {
             this.$navitron.attr('role', 'tree');
 
-            this.$navitron.find(selectors.PANE)
-                .attr('aria-hidden', 'false');
-
-            this.$navitron.find(selectors.NESTED_PANE).each(function(idx, el) {
+            this.$navitron.find(selectors.PANE).each(function(idx, el) {
                 var $el = $(el);
                 var levelId = $el.data('level');
 
@@ -612,6 +603,8 @@
                     .attr('aria-hidden', 'true')
                     .attr('id', 'Navitron_' + levelId);
             });
+
+            this.$navitron.find(selectors.CURRENT_PANE).attr('aria-hidden', 'false');
 
             this.$navitron.find(selectors.ITEM)
                 .attr('role', 'treeitem');
