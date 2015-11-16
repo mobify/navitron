@@ -167,23 +167,26 @@
 
                             $targetPane.attr('aria-hidden', 'false');
 
-                            plugin._setCurrentPane($targetPane);
-
                             // Keyboard navigation
                             plugin.setFocusableItems($targetPane);
 
-                            // Send focus to <ul> list
+                            // Send focus to <ul> list.
                             $targetPane.find(selectors.CONTENT).attr('tabindex', 0).focus();
 
-                            plugin._trigger('onShown', { pane: $targetPane });
+                            // Focus on previous menu item if applicable.
+                            $targetPane.find(selectors.NEXT_PANE + '[data-target-pane="' + plugin.$currentPane.data('level') + '"]').focus();
 
-                            // History API
+                            plugin._setCurrentPane($targetPane);
+
+                            // Setup history API
                             if ($targetPane.find(selectors.PREV_PANE).length) {
                                 var urlReplace = "#" + $targetPane.attr('id'); // make the hash the id of the pane shown
                                 history.pushState(null, null, urlReplace);
                             } else {
                                 history.pushState(null, null, window.location.pathname); // should indicate this is top level pane
                             }
+
+                            plugin._trigger('onShown', { pane: $targetPane });
                         });
                     }
                 })
@@ -438,13 +441,17 @@
             });
 
             $(window).on('popstate', function() {
-                if (!plugin.$navitron.is(":visible")) {
-                    window.history.go(-1);
-                }
-
-                if (plugin.$currentPane.find(selectors.PREV_PANE).length) {
-                    plugin.$currentPane.find(selectors.PREV_PANE).click();
+                // We only want to back out of panes when Navitron is visible
+                // Navitrons are commonly used in a sheet modal that slides in/out of page.
+                if (plugin.$navitron.is(":visible")) {
+                    if (plugin.$currentPane.find(selectors.PREV_PANE).length) {
+                        plugin.$currentPane.find(selectors.PREV_PANE).click();
+                    } else {
+                        window.history.go(-1);
+                    }
                 } else {
+                    // Not sure if this is safe to use. Would this override
+                    // other history API setup by other plugins/etc?
                     window.history.go(-1);
                 }
             });
