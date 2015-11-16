@@ -92,8 +92,8 @@
             this.$navitron.removeData(this.name);
         },
 
-        _setAnimationDirection: function($pane) {
-            if ($pane.hasClass(cssClasses.CURRENT_PANE)) {
+        _setAnimationDirection: function($pane, $targetPane) {
+            if ($pane.hasClass(cssClasses.CURRENT_PANE) && !$targetPane.hasClass(cssClasses.SLID_PANE)) {
                 return {
                     startX: '0',
                     endX: this.options.shiftAmount * -1 + '%',
@@ -108,7 +108,7 @@
                     startOpacity: this.options.fadeOpacityTo,
                     endOpacity: '1'
                 };
-            } else if ($pane.hasClass(cssClasses.DISMISS_PANE)) {
+            } else if ($pane.hasClass(cssClasses.DISMISS_PANE) || $pane.hasClass(cssClasses.CURRENT_PANE) && $targetPane.hasClass(cssClasses.SLID_PANE)) {
                 return {
                     startX: '0',
                     endX: '100%',
@@ -138,7 +138,7 @@
             var plugin = this;
             var $currentPane = plugin.$currentPane;
             var targetPaneAnimation = this._setAnimationDirection($targetPane);
-            var currentPaneAnimation = this._setAnimationDirection($currentPane);
+            var currentPaneAnimation = this._setAnimationDirection($currentPane, $targetPane);
 
             Velocity.animate(
                 $targetPane,
@@ -182,7 +182,7 @@
                                 var urlReplace = "#" + $targetPane.attr('id'); // make the hash the id of the pane shown
                                 history.pushState(null, null, urlReplace);
                             } else {
-                                history.pushState(null, null, ''); // should indicate this is top level pane
+                                history.pushState(null, null, window.location.pathname); // should indicate this is top level pane
                             }
                         });
                     }
@@ -438,7 +438,10 @@
             });
 
             $(window).on('popstate', function() {
-                // If there's
+                if (!plugin.$navitron.is(":visible")) {
+                    window.history.go(-1);
+                }
+
                 if (plugin.$currentPane.find(selectors.PREV_PANE).length) {
                     plugin.$currentPane.find(selectors.PREV_PANE).click();
                 } else {
