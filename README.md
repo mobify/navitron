@@ -69,30 +69,31 @@ For accessibility and functional purposes, Navitron will automatically wire up A
 <link rel="stylesheet" href="navitron-style.min.css">
 
 <!-- Include the markup -->
-<nav id="myNavitron" hidden>
-    <ul>
-        <li>
-            Level 1 Item 1
-            <ul>
-                <li>
-                    Level 2 Item 1
-                    <ul>
-                        <li>Level 3 Item 1</li>
-                        <li>Level 3 Item 2</li>
-                    </ul>
-                </li>
+    <nav id="myNavitron" hidden>
+        <ul>
+            <li>
+                <span class="navitron__next-pane">Level 1 Item 1</span>
 
-                <li>
-                    Level 2 Item 2
-                </li>
-            </ul>
-        </li>
+                <ul>
+                    <li>
+                        <span class="navitron__next-pane">Level 2 Item 1</span>
+                        <ul>
+                            <li>Level 3 Item 1</li>
+                            <li>Level 3 Item 2</li>
+                        </ul>
+                    </li>
 
-        <li>
-            Level 1 Item 2
-        </li>
-    </ul>
-</nav>
+                    <li>
+                        Level 2 Item 2
+                    </li>
+                </ul>
+            </li>
+
+            <li>
+                Level 1 Item 2
+            </li>
+        </ul>
+    </nav>
 
 <!-- Include dependencies -->
 <script src="zepto.min.js"></script>
