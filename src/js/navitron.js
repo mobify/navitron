@@ -176,6 +176,14 @@
                             $targetPane.find(selectors.CONTENT).attr('tabindex', 0).focus();
 
                             plugin._trigger('onShown', { pane: $targetPane });
+
+                            // History API
+                            if ($targetPane.find(selectors.PREV_PANE).length) {
+                                var urlReplace = "#" + $targetPane.attr('id'); // make the hash the id of the pane shown
+                                history.pushState(null, null, urlReplace);
+                            } else {
+                                history.pushState(null, null, ''); // should indicate this is top level pane
+                            }
                         });
                     }
                 })
@@ -427,6 +435,15 @@
              */
             this.$navitron.on('keydown', selectors.PANE, function(e) {
                 plugin._handleKeyDown($(this), e);
+            });
+
+            $(window).on('popstate', function() {
+                // If there's
+                if (plugin.$currentPane.find(selectors.PREV_PANE).length) {
+                    plugin.$currentPane.find(selectors.PREV_PANE).click();
+                } else {
+                    window.history.go(-1);
+                }
             });
         },
 
