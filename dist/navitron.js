@@ -81,7 +81,7 @@
 
             this._setAnimationDefaults();
 
-            this.$listItems = this.$original.find(selectors.ITEM);
+            // this.$listItems = this.$original.find(selectors.ITEM);
 
             this.$visibleItems = this.$currentPane.find(selectors.ITEM);
 
@@ -548,7 +548,8 @@
             var categoryId;
 
             // Set root data-level to 0
-            $topLevel.attr('data-level', '0');
+            $topLevel.attr('data-level', $.uniqueId());
+            // $topLevel.attr('data-level', '0');
 
             while (true) {
                 var $nestedLists = $topLevel.find(selector);
@@ -560,7 +561,7 @@
 
                         // Grabbing ul parent
                         var $parent = $nestedList.parents('ul').first();
-                        var dataLevel = $parent.data('level');
+                        var dataLevel = $parent.attr('data-level');
 
                         // Check if we have moved onto a different Category
                         // We 'reset' the index so nested items always start at 0 and onwards
@@ -572,6 +573,9 @@
 
                         // Set data-level to each nested list
                         $nestedList.attr('data-level', dataLevel + '.' + refreshIndex);
+
+                        console.info($nestedList.attr('data-level'));
+                        debugger;
 
                         refreshIndex++;
                     }); // jshint ignore:line
