@@ -75,13 +75,13 @@
 
             this._validateOptions();
 
+            this._uniqueId = $.uniqueId();
+
             this._build();
 
-            this.$currentPane = this._getTargetPane(0);
+            this.$currentPane = this._getTargetPane(this._uniqueId);
 
             this._setAnimationDefaults();
-
-            // this.$listItems = this.$original.find(selectors.ITEM);
 
             this.$visibleItems = this.$currentPane.find(selectors.ITEM);
 
@@ -274,7 +274,7 @@
                 // If there's nested <ul> run _buildNestedLevels function again
                 if ($nestedList.length) {
                     // Get level data
-                    var level = $nestedList.data('level');
+                    var level = $nestedList.attr('data-level');
                     var targetLevel = plugin._getParentLevel(level);
                     var $contents = $item.contents().not($(selectors.NEXT_PANE));
 
@@ -390,14 +390,14 @@
              */
             this.$navitron.on('click', selectors.NEXT_PANE, function() {
                 var $button = $(this);
-                var levelData = $button.data();
-                var $targetPane = plugin._getTargetPane(levelData.targetPane);
+                var levelData = $button.attr('data-target-pane');
+                var $targetPane = plugin._getTargetPane(levelData);
 
                 // We don't want to shift/slide anything if we're clicking on an anchor
                 // or the target pane does not exist
                 if ($button.is('a') || $button.has('a').length || !$targetPane.length) {
                     if (!$targetPane.length) {
-                        throw new Error('Target pane with ID: ' + levelData.targetPane + ' does not exist!');
+                        throw new Error('Target pane with ID: ' + levelData + ' does not exist!');
                     }
 
                     return;
@@ -415,8 +415,8 @@
              */
             this.$navitron.on('click', selectors.PREV_PANE, function() {
                 var $button = $(this);
-                var buttonProperties = $button.data();
-                var $targetPane = plugin._getTargetPane(buttonProperties.targetPane);
+                var buttonProperties = $button.attr('data-target-pane');
+                var $targetPane = plugin._getTargetPane(buttonProperties);
 
                 // Set CSS classes for proper animation detection
                 plugin.$currentPane.removeClass(cssClasses.CURRENT_PANE)
@@ -523,9 +523,8 @@
             var selector = '> li > ul ';
             var categoryId;
 
-            // Set root data-level to 0
-            // $topLevel.attr('data-level', $.uniqueId());
-            $topLevel.attr('data-level', '0');
+            $topLevel.attr('data-level', this._uniqueId);
+            // $topLevel.attr('data-level', '0');
 
             while (true) {
                 var $nestedLists = $topLevel.find(selector);
@@ -585,10 +584,6 @@
             return this.$navitron.find(selectors.PANE + '[data-level="' + pane + '"]');
         },
 
-        _getTranslateX: function($element) {
-            return parseFloat(Velocity.CSS.getPropertyValue($element[0], 'translateX'));
-        },
-
         /**
          * Ensure Navitron markup gets accessibility attributes
          *
@@ -599,13 +594,12 @@
 
             this.$navitron.find(selectors.PANE).each(function(idx, el) {
                 var $el = $(el);
-                var levelId = $el.data('level');
+                var levelId = $el.attr('data-level');
 
-                // Prefixing ID with 'Navitron_' to ensure we don't set a duplicate client ID accidentally
                 $el
                     .attr('role', 'group')
                     .attr('aria-hidden', 'true')
-                    .attr('id', 'Navitron_' + levelId);
+                    .attr('id', levelId);
             });
 
             this.$navitron.find(selectors.CURRENT_PANE).attr('aria-hidden', 'false');
@@ -615,11 +609,11 @@
 
             this.$navitron.find(selectors.NEXT_PANE).each(function(idx, el) {
                 var $el = $(el);
-                var targetId = $el.data('target-pane');
+                var targetId = $el.attr('data-target-pane');
 
                 $el
                     .attr('aria-expanded', 'false')
-                    .attr('aria-owns', 'Navitron_' + targetId);
+                    .attr('aria-owns', targetId);
             });
         },
 
