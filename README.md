@@ -321,6 +321,10 @@ $('#myNavitron').navitron('showPane', $targetPane);
 
 Currently for AOSP browsers 4.0.x - 4.1.x, the panes do not animate smoothly when CSS box-shadow is applied to them and have minor rendering artifacts where some of the content is cut off. It is recommended to disable box-shadows for these browsers.
 
+## Enhancements
+
+You could hook into Navitron's 'onShown' and use the history API to push states so browser's back button can drill up the menu.
+
 ## Working with Navitron locally
 
 ### Requirements
