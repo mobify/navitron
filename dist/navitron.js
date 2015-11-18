@@ -178,14 +178,6 @@
 
                             plugin._setCurrentPane($targetPane);
 
-                            // Setup history API
-                            if ($targetPane.find(selectors.PREV_PANE).length) {
-                                var urlReplace = "#" + $targetPane.attr('id'); // make the hash the id of the pane shown
-                                history.pushState(null, null, urlReplace);
-                            } else {
-                                history.pushState(null, null, window.location.pathname); // should indicate this is top level pane
-                            }
-
                             plugin._trigger('onShown', { pane: $targetPane });
                         });
                     }
@@ -439,22 +431,6 @@
             this.$navitron.on('keydown', selectors.PANE, function(e) {
                 plugin._handleKeyDown($(this), e);
             });
-
-            $(window).on('popstate', function() {
-                // We only want to back out of panes when Navitron is visible
-                // Navitrons are commonly used in a sheet modal that slides in/out of page.
-                if (plugin.$navitron.is(":visible")) {
-                    if (plugin.$currentPane.find(selectors.PREV_PANE).length) {
-                        plugin.$currentPane.find(selectors.PREV_PANE).click();
-                    } else {
-                        window.history.go(-1);
-                    }
-                } else {
-                    // Not sure if this is safe to use. Would this override
-                    // other history API setup by other plugins/etc?
-                    window.history.go(-1);
-                }
-            });
         },
 
         _handleKeyDown: function($pane, e) {
@@ -548,8 +524,8 @@
             var categoryId;
 
             // Set root data-level to 0
-            $topLevel.attr('data-level', $.uniqueId());
-            // $topLevel.attr('data-level', '0');
+            // $topLevel.attr('data-level', $.uniqueId());
+            $topLevel.attr('data-level', '0');
 
             while (true) {
                 var $nestedLists = $topLevel.find(selector);
@@ -573,9 +549,6 @@
 
                         // Set data-level to each nested list
                         $nestedList.attr('data-level', dataLevel + '.' + refreshIndex);
-
-                        console.info($nestedList.attr('data-level'));
-                        debugger;
 
                         refreshIndex++;
                     }); // jshint ignore:line
