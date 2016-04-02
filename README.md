@@ -2,6 +2,12 @@
 
 A mobile optimized sliding navigation plugin.
 
+[![NPM](https://nodei.co/npm/navitron.png?downloads=true)](https://nodei.co/npm/navitron/)
+
+## Demo
+
+You can find a simple demo inside the `examples` folder in the repo. Run `grunt examples` to see it in Chrome (mobile device emulation is recommended).
+
 ## Dependencies
 
 * [jQuery](http://jquery.com/)
