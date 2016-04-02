@@ -9,7 +9,7 @@
         var framework = window.jQuery;
         factory(framework, window.Plugin, window.Velocity);
     }
-}(function($, Plugin, Velocity) {
+})(function($, Plugin, Velocity) {
     var selectors = {
         PANE: '.navitron__pane',
         NESTED_PANE: '.navitron__nested > .navitron__pane',
@@ -48,9 +48,9 @@
         BUTTON: '<button type="button" class="' + cssClasses.ITEM + '"></button>',
     };
 
-    function Navitron(element, options) {
+    var Navitron = function(element, options) {
         Navitron.__super__.call(this, element, options, Navitron.DEFAULTS);
-    }
+    };
 
     Navitron.VERSION = '0';
 
@@ -303,7 +303,7 @@
             var $content = $(template.CONTENT);
             var $button = $(template.BUTTON);
 
-            $listItems.each(function (index, item) {
+            $listItems.each(function(index, item) {
                 var $item = $(item);
                 var $nestedList = $item.children('ul');
 
@@ -559,7 +559,7 @@
                 var refreshIndex = 0;
 
                 if ($nestedLists.length) {
-                    $nestedLists.each(function (index, item) {
+                    $nestedLists.each(function(index, item) {
                         var $nestedList = $(item);
 
                         // Grabbing ul parent
@@ -578,7 +578,7 @@
                         $nestedList.attr('data-level', dataLevel + '.' + refreshIndex);
 
                         refreshIndex++;
-                    }); // jshint ignore:line
+                    });
 
                     selector += '> li > ul';
                 } else {
@@ -667,4 +667,4 @@
     $('[data-navitron]').navitron();
 
     return $;
-}));
+});
