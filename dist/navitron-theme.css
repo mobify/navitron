@@ -9,9 +9,9 @@
 .navitron__item {
   position: relative;
   display: block;
-  border: none;
-  padding: 16px;
   width: 100%;
+  padding: 16px;
+  border: 0;
   background: none;
   color: white;
   font-size: 14px;

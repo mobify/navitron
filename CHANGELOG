@@ -4,5 +4,6 @@
     - Migrate from Bower to NPM for dependencies
     - Migrate JS linting to eslint
     - Migrate SCSS compilation to libsass
+    - Lint SCSS with sass-lint
 0.0.1
     - Legacy release
