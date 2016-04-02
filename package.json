@@ -29,7 +29,8 @@
     "jshint": "2.5.0",
     "mobify-code-style": "^2.4.3",
     "mocha": "1.14.0",
-    "requirejs-glob": "git+https://git@github.com/mobify/requirejs-glob.git"
+    "requirejs-glob": "git+https://git@github.com/mobify/requirejs-glob.git",
+    "text": "requirejs/text"
   },
   "license": "MIT",
   "bugs": {
@@ -53,5 +54,10 @@
     "navigation",
     "menu"
   ],
-  "author": "Mobify"
+  "author": "Mobify",
+  "dependencies": {
+    "plugin": "git+https://github.com/mobify/plugin.git#3.1.0",
+    "requirejs": "2.2.0",
+    "velocity-animate": "1.2.3"
+  }
 }

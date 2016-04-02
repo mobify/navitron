@@ -28,8 +28,9 @@ We highly recommend using Require.js with Navitron. To use Require, you have to 
 
 {
     'paths': {
-        'plugin': 'bower_components/plugin/dist/plugin.min',
-        'navitron': 'bower_components/navitron/dist/navitron.min'
+        '$': 'node_modules/jquery/dist/jquery.min',
+        'plugin': 'node_modules/plugin/dist/plugin.min',
+        'navitron': 'node_modules/navitron/dist/navitron.min'
     }
 }
 
