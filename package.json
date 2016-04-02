@@ -25,6 +25,7 @@
     "grunt-open": "0.2.3",
     "grunt-shell": "0.2.2",
     "grunt-version": "0.3.3",
+    "jquery": "2.2.2",
     "jshint": "2.5.0",
     "mobify-code-style": "^2.4.3",
     "mocha": "1.14.0",

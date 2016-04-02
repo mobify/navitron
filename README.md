@@ -4,18 +4,13 @@ A mobile optimized sliding navigation plugin.
 
 ## Dependencies
 
-* [Zepto](http://zeptojs.com/)
+* [jQuery](http://jquery.com/)
 * [Mobify's fork of Velocity.js](http://github.com/mobify/velocity)
 * [Plugin](http://github.com/mobify/plugin)
 
+### Zepto Support
 
-### Velocity
-
-If you are using Zepto, you need to load `bower_components/mobify-velocity/velocity.js` (this file comes with a jQuery shim bundled directly in it). If you are using jQuery, you need to load `bower_components/velocity/jquery.velocity.js`.
-
-### jQuery Support
-
-Navitron supports jQuery but is not actively developed for it. You should be able to use Navitron directly with jQuery 2.0. While we don't actively support jQuery for Navitron, we welcome any and all issues and PRs to help us make it work.
+While we don't actively support Zepto for Navitron, we welcome any and all issues and PRs to help us make it work.
 
 ## Installation
 
@@ -44,7 +39,7 @@ And then require Navitron in as needed:
 
 ```
 define([
-    'zepto',
+    '$',
     'navitron'
     ],
     function($) {
@@ -96,7 +91,7 @@ For accessibility and functional purposes, Navitron will automatically wire up A
     </nav>
 
 <!-- Include dependencies -->
-<script src="zepto.min.js"></script>
+<script src="jquery.min.js"></script>
 <script src="velocity.min.js"></script>
 <script src="plugin.min.js"></script>
 

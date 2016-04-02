@@ -6,7 +6,7 @@
             'velocity'
         ], factory);
     } else {
-        var framework = window.Zepto || window.jQuery;
+        var framework = window.jQuery;
         factory(framework, window.Plugin, window.Velocity);
     }
 }(function($, Plugin, Velocity) {
@@ -52,7 +52,7 @@
         Navitron.__super__.call(this, element, options, Navitron.DEFAULTS);
     }
 
-    Navitron.VERSION = '0.0.1';
+    Navitron.VERSION = '1.0.0';
 
     Navitron.DEFAULTS = {
         shiftAmount: 20,
