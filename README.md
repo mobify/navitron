@@ -5,8 +5,8 @@ A mobile optimized sliding navigation plugin.
 ## Dependencies
 
 * [jQuery](http://jquery.com/)
-* [Mobify's fork of Velocity.js](http://github.com/mobify/velocity)
-* [Plugin](http://github.com/mobify/plugin)
+* [Velocity.js](http://julian.com/research/velocity/)
+* [Plugin](https://github.com/mobify/plugin)
 
 ### Zepto Support
 
@@ -14,22 +14,23 @@ While we don't actively support Zepto for Navitron, we welcome any and all issue
 
 ## Installation
 
-Navitron can be installed using bower:
+Navitron can be installed using NPM:
 
 ```
-bower install navitron
+npm install navitron
 ```
 
 ## Usage with Require.js
 
-We highly recommend using Require.js with Navitron. To use Require, you have to reference Navitron inside your require config file:
+We highly recommend using Require.js with Navitron. To use Require, you have to reference Navitron inside your require config file (**Note**: If your project already has these external dependencies, and the versions are compatible, it's recommended that you use the one in your project to reduce duplication):
 
 ```config.js
 
 {
     'paths': {
-        '$': 'node_modules/jquery/dist/jquery.min',
-        'plugin': 'node_modules/plugin/dist/plugin.min',
+        '$': 'node_modules/navitron/node_modules/jquery/dist/jquery.min',
+        'plugin': 'node_modules/navitron/node_modules/plugin/dist/plugin.min',
+        'velocity': 'node_modules/navitron/node_modules/velocity-animate/velocity.min',
         'navitron': 'node_modules/navitron/dist/navitron.min'
     }
 }
@@ -62,7 +63,7 @@ For accessibility and functional purposes, Navitron will automatically wire up A
 <link rel="stylesheet" href="navitron.min.css">
 
 <!-- Optionally include the Theme file -->
-<link rel="stylesheet" href="navitron-style.min.css">
+<link rel="stylesheet" href="navitron-theme.min.css">
 
 <!-- Include the markup -->
     <nav id="myNavitron" hidden>
@@ -150,7 +151,7 @@ $('#myNavitron').navitron({
 
 default: `200`
 
-Sets the duration for the animation.
+Sets the duration for the animation (ms).
 
 ```js
 $('#myNavitron').navitron({
@@ -322,17 +323,13 @@ Currently for AOSP browsers 4.0.x - 4.1.x, the panes do not animate smoothly whe
 
 ### Requirements
 
-* [Node.js 0.10.x/npm](http://nodejs.org/download/)
+* [Node.js v4.x LTS + NPM v2.x](https://nodejs.org/en/download/) (Mobify recommends [NVM](https://github.com/creationix/nvm) for installing Node + NPM)
 * [Grunt](http://gruntjs.com/)
   * Install with `npm install -g grunt-cli`
-* [Bower](http://bower.io/)
-  * Install with `npm install -g bower`
-
 
 ### Steps
 1. Clone Navitron repo
 1. `npm install`
-1. `bower install`
 1. `grunt serve`
 1. Preview the site at http://localhost:3000
 1. Navigate to examples folder
@@ -344,10 +341,10 @@ Currently for AOSP browsers 4.0.x - 4.1.x, the panes do not animate smoothly whe
 * `grunt serve` - runs the server, building changes and then watching for changes. Use grunt serve to preview the site at **http://localhost:3000**
 * `grunt test` - runs the test suite in your console
 * `grunt test:browser` - runs a server that allows you to run the test suite in your browser
-
+* `grunt examples` - same as `grunt serve`, but will automatically open Google Chrome to the examples page
 
 The `dist` directory will be populated with minified versions of the css and javascript files for distribution and use with whatever build system you might use. The `src` directory has our raw unminified Sass and Javascript files if you prefer to work with those.
 
 ## License
 
-_MIT License. Navitron is Copyright © 2015 Mobify. It is free software and may be redistributed under the terms specified in the LICENSE file._
+_MIT License. Navitron is Copyright © 2016 Mobify. It is free software and may be redistributed under the terms specified in the LICENSE file._
