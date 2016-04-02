@@ -6,11 +6,11 @@ module.exports = function(grunt) {
             },
             src: ['dist/navitron.js', 'dist/navitron.min.js']
         },
-        bower: {
+        npm: {
             options: {
                 prefix: '"version":\\s*"'
             },
-            src: ['bower.json']
+            src: ['package.json']
         }
-    }
+    };
 };
