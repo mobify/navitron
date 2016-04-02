@@ -8,6 +8,26 @@ define([
     var $nestedPane;
 
     describe('Navitron events', function() {
+        var stringify = JSON.stringify;
+
+        before(function() {
+            JSON.stringify = function(obj) {
+                var seen = [];
+
+                return stringify(obj, function(key, val) {
+                    if (typeof val === 'object') {
+                        if (seen.indexOf(val) >= 0) { return; }
+                        seen.push(val);
+                    }
+                    return val;
+                });
+            };
+        });
+
+        after(function() {
+            JSON.stringify = stringify;
+        });
+
         beforeEach(function(done) {
             var setUpComplete = function(iFrame$, dependencies) {
                 $ = iFrame$;
@@ -21,8 +41,6 @@ define([
         });
 
         it('fires the onShow event before navitron pane slides in', function(done) {
-            console.info($element);
-
             $element.navitron({
                 onShow: function() {
                     done();
@@ -35,8 +53,6 @@ define([
         });
 
         it('fires the onShown event after navitron pane is slid in', function(done) {
-            console.info($element);
-
             $element.navitron({
                 onShown: function() {
                     done();
