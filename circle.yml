@@ -9,5 +9,6 @@ dependencies:
 
 test:
     override:
+        - grunt sasslint
         - grunt lint:prod
         - grunt test
