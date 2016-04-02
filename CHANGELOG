@@ -2,5 +2,6 @@
     - Publish to NPM
     - Use jQuery and latest Velocity release
     - Migrate from Bower to NPM for dependencies
+    - Migrate JS linting to eslint
 0.0.1
     - Legacy release
