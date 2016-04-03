@@ -108,19 +108,29 @@
                 $.extend(true, {}, this.animationDefaults, {
                     display: 'block',
                     begin: function() {
-                        window.requestAnimationFrame(function() {
+                        // Some things in life are unfair. One of them is the
+                        //  fact that phantomJS doesn't support requestAnimationFrame
+                        var beginActions = function() {
                             // Enforce only one pane to animate at a time
                             plugin.$navitron.addClass(cssClasses.ANIMATING);
 
                             plugin._trigger('onShow', { pane: $pane });
-                        });
+                        };
+                        if (typeof window.requestAnimationFrame === 'function') {
+                            window.requestAnimationFrame(beginActions);
+                        } else {
+                            beginActions();
+                        }
                     },
                     complete: function() {
                         // Complete callback function actually gets called BEFORE animation finishes
                         // animating. Performing these functions at this point would causing
                         // jank in the animation. We'll use requestAnimationFrame to queue up these
                         // functions after animation has ended.
-                        window.requestAnimationFrame(function() {
+
+                        // Some things in life are unfair. One of them is the
+                        //  fact that phantomJS doesn't support requestAnimationFrame
+                        var completeActions = function() {
                             // Enforce only one pane to animate at a time
                             plugin.$navitron.removeClass(cssClasses.ANIMATING);
 
@@ -135,7 +145,13 @@
                             $pane.find(selectors.CONTENT).attr('tabindex', 0).focus();
 
                             plugin._trigger('onShown', { pane: $pane });
-                        });
+                        };
+
+                        if (typeof window.requestAnimationFrame === 'function') {
+                            window.requestAnimationFrame(completeActions);
+                        } else {
+                            completeActions();
+                        }
                     }
                 })
             );
@@ -149,9 +165,15 @@
                 $.extend(true, {}, this.animationDefaults, {
                     display: 'none',
                     complete: function() {
-                        window.requestAnimationFrame(function() {
+                        // Some things in life are unfair. One of them is the
+                        //  fact that phantomJS doesn't support requestAnimationFrame
+                        if (typeof window.requestAnimationFrame === 'function') {
+                            window.requestAnimationFrame(function() {
+                                $shiftMenu.attr('aria-hidden', 'true');
+                            });
+                        } else {
                             $shiftMenu.attr('aria-hidden', 'true');
-                        });
+                        }
                     }
                 })
             );
@@ -173,9 +195,15 @@
                 $.extend(true, {}, this.animationDefaults, {
                     display: 'none',
                     complete: function() {
-                        window.requestAnimationFrame(function() {
+                        // Some things in life are unfair. One of them is the
+                        //  fact that phantomJS doesn't support requestAnimationFrame
+                        if (typeof window.requestAnimationFrame === 'function') {
+                            window.requestAnimationFrame(function() {
+                                $pane.attr('aria-hidden', 'true');
+                            });
+                        } else {
                             $pane.attr('aria-hidden', 'true');
-                        });
+                        }
                     }
                 })
             );
@@ -206,15 +234,22 @@
                 $.extend(true, {}, this.animationDefaults, {
                     display: 'block',
                     begin: function() {
-                        window.requestAnimationFrame(function() {
+                        var beginActions = function() {
                             // Enforce only one pane to animate at a time
                             plugin.$navitron.addClass(cssClasses.ANIMATING);
 
                             plugin._trigger('onShow', { pane: $targetPane });
-                        });
+                        };
+                        // Some things in life are unfair. One of them is the
+                        //  fact that phantomJS doesn't support requestAnimationFrame
+                        if (typeof window.requestAnimationFrame === 'function') {
+                            window.requestAnimationFrame(beginActions);
+                        } else {
+                            beginActions();
+                        }
                     },
                     complete: function() {
-                        window.requestAnimationFrame(function() {
+                        var completeActions = function() {
                             // Enforce only one pane to animate at a time
                             plugin.$navitron.removeClass(cssClasses.ANIMATING);
 
@@ -231,7 +266,14 @@
 
                             // Setting new controllable items for keyboard navigation
                             plugin.setFocusableItems($targetPane);
-                        });
+                        };
+                        // Some things in life are unfair. One of them is the
+                        //  fact that phantomJS doesn't support requestAnimationFrame
+                        if (typeof window.requestAnimationFrame === 'function') {
+                            window.requestAnimationFrame(completeActions);
+                        } else {
+                            completeActions();
+                        }
                     }
                 })
             );
