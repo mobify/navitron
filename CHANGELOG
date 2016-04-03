@@ -7,5 +7,6 @@
     - Lint SCSS with sass-lint
     - Update circleCI config with modern testing steps
     - Add some GitHub templates for contributing, issues, and PRs
+    - Fix circleCI tests (phantomJS does not support requestAnimationFrame)
 0.0.1
     - Legacy release
