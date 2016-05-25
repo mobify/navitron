@@ -52,6 +52,19 @@
         Navitron.__super__.call(this, element, options, Navitron.DEFAULTS);
     };
 
+    var _callRAF = function(cb) {
+        // window.requestAnimationFrame is not always available
+        // (e.g. see our testing framework's usage of phantomJS)
+        // but we _do_ want to use it if it's available.
+        // This method will trampoline the passed callback into RAF if it's
+        // available, otherwise it will just simply run the callback sans RAF
+        if (typeof window.requestAnimationFrame === 'function') {
+            window.requestAnimationFrame(cb);
+        } else {
+            cb();
+        }
+    };
+
     Navitron.VERSION = '0';
 
     Navitron.DEFAULTS = {
@@ -108,28 +121,19 @@
                 $.extend(true, {}, this.animationDefaults, {
                     display: 'block',
                     begin: function() {
-                        // Some things in life are unfair. One of them is the
-                        //  fact that phantomJS doesn't support requestAnimationFrame
                         var beginActions = function() {
                             // Enforce only one pane to animate at a time
                             plugin.$navitron.addClass(cssClasses.ANIMATING);
 
                             plugin._trigger('onShow', { pane: $pane });
                         };
-                        if (typeof window.requestAnimationFrame === 'function') {
-                            window.requestAnimationFrame(beginActions);
-                        } else {
-                            beginActions();
-                        }
+                        _callRAF(beginActions);
                     },
                     complete: function() {
                         // Complete callback function actually gets called BEFORE animation finishes
                         // animating. Performing these functions at this point would causing
                         // jank in the animation. We'll use requestAnimationFrame to queue up these
                         // functions after animation has ended.
-
-                        // Some things in life are unfair. One of them is the
-                        //  fact that phantomJS doesn't support requestAnimationFrame
                         var completeActions = function() {
                             // Enforce only one pane to animate at a time
                             plugin.$navitron.removeClass(cssClasses.ANIMATING);
@@ -146,12 +150,7 @@
 
                             plugin._trigger('onShown', { pane: $pane });
                         };
-
-                        if (typeof window.requestAnimationFrame === 'function') {
-                            window.requestAnimationFrame(completeActions);
-                        } else {
-                            completeActions();
-                        }
+                        _callRAF(completeActions);
                     }
                 })
             );
@@ -165,15 +164,10 @@
                 $.extend(true, {}, this.animationDefaults, {
                     display: 'none',
                     complete: function() {
-                        // Some things in life are unfair. One of them is the
-                        //  fact that phantomJS doesn't support requestAnimationFrame
-                        if (typeof window.requestAnimationFrame === 'function') {
-                            window.requestAnimationFrame(function() {
-                                $shiftMenu.attr('aria-hidden', 'true');
-                            });
-                        } else {
+                        var completeActions = function() {
                             $shiftMenu.attr('aria-hidden', 'true');
-                        }
+                        };
+                        _callRAF(completeActions);
                     }
                 })
             );
@@ -195,15 +189,10 @@
                 $.extend(true, {}, this.animationDefaults, {
                     display: 'none',
                     complete: function() {
-                        // Some things in life are unfair. One of them is the
-                        //  fact that phantomJS doesn't support requestAnimationFrame
-                        if (typeof window.requestAnimationFrame === 'function') {
-                            window.requestAnimationFrame(function() {
-                                $pane.attr('aria-hidden', 'true');
-                            });
-                        } else {
+                        var completeActions = function() {
                             $pane.attr('aria-hidden', 'true');
-                        }
+                        };
+                        _callRAF(completeActions);
                     }
                 })
             );
@@ -240,13 +229,7 @@
 
                             plugin._trigger('onShow', { pane: $targetPane });
                         };
-                        // Some things in life are unfair. One of them is the
-                        //  fact that phantomJS doesn't support requestAnimationFrame
-                        if (typeof window.requestAnimationFrame === 'function') {
-                            window.requestAnimationFrame(beginActions);
-                        } else {
-                            beginActions();
-                        }
+                        _callRAF(beginActions);
                     },
                     complete: function() {
                         var completeActions = function() {
@@ -267,13 +250,7 @@
                             // Setting new controllable items for keyboard navigation
                             plugin.setFocusableItems($targetPane);
                         };
-                        // Some things in life are unfair. One of them is the
-                        //  fact that phantomJS doesn't support requestAnimationFrame
-                        if (typeof window.requestAnimationFrame === 'function') {
-                            window.requestAnimationFrame(completeActions);
-                        } else {
-                            completeActions();
-                        }
+                        _callRAF(completeActions);
                     }
                 })
             );
