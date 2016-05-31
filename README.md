@@ -22,7 +22,7 @@ While we don't actively support Zepto for Navitron, we welcome any and all issue
 
 Navitron can be installed using NPM:
 
-```
+```bash
 npm install navitron
 ```
 
@@ -30,8 +30,7 @@ npm install navitron
 
 We highly recommend using Require.js with Navitron. To use Require, you have to reference Navitron inside your require config file (**Note**: If your project already has these external dependencies, and the versions are compatible, it's recommended that you use the one in your project to reduce duplication):
 
-```config.js
-
+```js
 {
     'paths': {
         '$': 'node_modules/navitron/node_modules/jquery/dist/jquery.min',
@@ -40,12 +39,11 @@ We highly recommend using Require.js with Navitron. To use Require, you have to 
         'navitron': 'node_modules/navitron/dist/navitron.min'
     }
 }
-
 ```
 
 And then require Navitron in as needed:
 
-```
+```js
 define([
     '$',
     'navitron'
