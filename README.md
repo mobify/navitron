@@ -329,7 +329,7 @@ Currently for AOSP browsers 4.0.x - 4.1.x, the panes do not animate smoothly whe
 
 ### Requirements
 
-* [Node.js v4.x LTS + NPM v2.x](https://nodejs.org/en/download/) (Mobify recommends [NVM](https://github.com/creationix/nvm) for installing Node + NPM)
+* [Node.js v4.0.0 - v4.4.5 LTS + NPM v2.0.0 - v2.15.5](https://nodejs.org/en/download/) (Mobify recommends [NVM](https://github.com/creationix/nvm) for installing Node + NPM)
 * [Grunt](http://gruntjs.com/)
   * Install with `npm install -g grunt-cli`
 
