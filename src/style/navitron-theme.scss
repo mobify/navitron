@@ -1,4 +1,78 @@
+// Navitron Theme
+// ==============
+//
+// This is the defauly Navitron Theme!
+//
+// This theme is OPTIONAL
 
 .navitron {
+    background: #4d4d4d;
+}
 
+
+// Navitron: Pane
+// --------------
+
+.navitron__pane {
+    background: #4d4d4d;
+}
+
+
+// Navitron: Item
+// --------------
+
+.navitron__item {
+    position: relative;
+
+    display: block;
+    width: 100%;
+    padding: 16px;
+    border: 0;
+
+    background: none;
+
+    color: white;
+    font-size: 14px;
+    text-align: left;
+}
+
+
+// Navitron: Prev Pane Toggle
+// --------------------------
+
+.navitron__prev-pane::before {
+    content: '';
+
+    display: inline-block;
+    margin-right: 12px;
+    margin-left: -5px;
+    border: 5px solid transparent;
+    border-right-color: white;
+}
+
+
+// Navitron: Next Pane Toggle
+// --------------------------
+
+.navitron__next-pane::after {
+    content: '';
+
+    position: absolute;
+    top: 50%;
+    right: 16px;
+
+    display: block;
+    margin-top: -5px;
+    margin-right: -5px;
+    border: 5px solid transparent;
+    border-left-color: white;
+}
+
+
+// Navitron: Header & Footer
+// -------------------------
+
+.navitron__header,
+.navitron__footer {
+    background-color: #292929;
 }

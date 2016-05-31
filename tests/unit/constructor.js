@@ -20,8 +20,7 @@ define([
         });
 
         it('creates a navitron instance', function() {
-            var navitron = new Navitron($element, {
-            });
+            var navitron = new Navitron($element, {});
 
             expect(navitron).to.be.defined;
         });

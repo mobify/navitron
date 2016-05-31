@@ -65,7 +65,7 @@
         }
     };
 
-    Navitron.VERSION = '0';
+    Navitron.VERSION = '1.0.0';
 
     Navitron.DEFAULTS = {
         shiftAmount: 20,
