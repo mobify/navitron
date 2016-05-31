@@ -28,18 +28,18 @@ module.exports = function(grunt) {
 
     // load npm tasks
     var npmTasks = [
+        'grunt-autoprefixer',
+        'grunt-concurrent',
+        'grunt-contrib-clean',
+        'grunt-contrib-connect',
+        'grunt-contrib-copy',
         'grunt-contrib-uglify',
         'grunt-contrib-watch',
-        'grunt-contrib-connect',
-        'grunt-css',
-        'grunt-concurrent',
-        'grunt-open',
-        'grunt-shell',
-        'grunt-contrib-clean',
-        'grunt-contrib-copy',
-        'grunt-autoprefixer',
-        'grunt-contrib-sass',
         'grunt-mocha-phantomjs',
+        'grunt-open',
+        'grunt-sass',
+        'grunt-sass-lint',
+        'grunt-shell',
         'grunt-version'
     ];
 
@@ -51,8 +51,8 @@ module.exports = function(grunt) {
 
     grunt.registerTask('serve', ['build', 'connect:server', 'watch']);
     grunt.registerTask('examples', ['build', 'connect:server', 'open:examples', 'watch']);
-    grunt.registerTask('build', ['lint:dev', 'copy', 'uglify', 'version:all', 'sass', 'autoprefixer', 'cssmin']);
-    grunt.registerTask('release', ['lint:dev', 'test', 'shell:tagRelease']);
+    grunt.registerTask('build', ['lint:prod', 'sasslint', 'copy', 'uglify', 'version:all', 'sass', 'autoprefixer']);
+    grunt.registerTask('release', ['lint:prod', 'sasslint', 'test', 'shell:tagRelease']);
     grunt.registerTask('test', ['build', 'connect:test', 'mocha_phantomjs']);
     grunt.registerTask('test:browser', ['build', 'concurrent:tests']);
     grunt.registerTask('default', 'build');

@@ -1,10 +1,10 @@
 require.config({
     baseUrl: '../',
     paths: {
-        'text': 'bower_components/requirejs-text/text',
-        '$': 'lib/zeptojs/dist/zepto',
-        'velocity': 'bower_components/mobify-velocity/velocity',
-        'plugin': 'bower_components/plugin/dist/plugin',
+        'text': 'node_modules/text/text',
+        '$': 'node_modules/jquery/dist/jquery.min',
+        'velocity': 'node_modules/velocity-animate/velocity',
+        'plugin': 'node_modules/plugin/dist/plugin',
         'navitron': 'src/js/navitron'
     },
     'shim': {

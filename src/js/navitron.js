@@ -6,10 +6,10 @@
             'velocity'
         ], factory);
     } else {
-        var framework = window.Zepto || window.jQuery;
+        var framework = window.jQuery;
         factory(framework, window.Plugin, window.Velocity);
     }
-}(function($, Plugin, Velocity) {
+})(function($, Plugin, Velocity) {
     var selectors = {
         PANE: '.navitron__pane',
         NESTED_PANE: '.navitron__nested > .navitron__pane',
@@ -48,9 +48,22 @@
         BUTTON: '<button type="button" class="' + cssClasses.ITEM + '"></button>',
     };
 
-    function Navitron(element, options) {
+    var Navitron = function(element, options) {
         Navitron.__super__.call(this, element, options, Navitron.DEFAULTS);
-    }
+    };
+
+    var _callRAF = function(cb) {
+        // window.requestAnimationFrame is not always available
+        // (e.g. see our testing framework's usage of phantomJS)
+        // but we _do_ want to use it if it's available.
+        // This method will trampoline the passed callback into RAF if it's
+        // available, otherwise it will just simply run the callback sans RAF
+        if (typeof window.requestAnimationFrame === 'function') {
+            window.requestAnimationFrame(cb);
+        } else {
+            cb();
+        }
+    };
 
     Navitron.VERSION = '0';
 
@@ -108,19 +121,20 @@
                 $.extend(true, {}, this.animationDefaults, {
                     display: 'block',
                     begin: function() {
-                        window.requestAnimationFrame(function() {
+                        var beginActions = function() {
                             // Enforce only one pane to animate at a time
                             plugin.$navitron.addClass(cssClasses.ANIMATING);
 
                             plugin._trigger('onShow', { pane: $pane });
-                        });
+                        };
+                        _callRAF(beginActions);
                     },
                     complete: function() {
                         // Complete callback function actually gets called BEFORE animation finishes
                         // animating. Performing these functions at this point would causing
                         // jank in the animation. We'll use requestAnimationFrame to queue up these
                         // functions after animation has ended.
-                        window.requestAnimationFrame(function() {
+                        var completeActions = function() {
                             // Enforce only one pane to animate at a time
                             plugin.$navitron.removeClass(cssClasses.ANIMATING);
 
@@ -135,7 +149,8 @@
                             $pane.find(selectors.CONTENT).attr('tabindex', 0).focus();
 
                             plugin._trigger('onShown', { pane: $pane });
-                        });
+                        };
+                        _callRAF(completeActions);
                     }
                 })
             );
@@ -149,9 +164,10 @@
                 $.extend(true, {}, this.animationDefaults, {
                     display: 'none',
                     complete: function() {
-                        window.requestAnimationFrame(function() {
+                        var completeActions = function() {
                             $shiftMenu.attr('aria-hidden', 'true');
-                        });
+                        };
+                        _callRAF(completeActions);
                     }
                 })
             );
@@ -173,9 +189,10 @@
                 $.extend(true, {}, this.animationDefaults, {
                     display: 'none',
                     complete: function() {
-                        window.requestAnimationFrame(function() {
+                        var completeActions = function() {
                             $pane.attr('aria-hidden', 'true');
-                        });
+                        };
+                        _callRAF(completeActions);
                     }
                 })
             );
@@ -206,15 +223,16 @@
                 $.extend(true, {}, this.animationDefaults, {
                     display: 'block',
                     begin: function() {
-                        window.requestAnimationFrame(function() {
+                        var beginActions = function() {
                             // Enforce only one pane to animate at a time
                             plugin.$navitron.addClass(cssClasses.ANIMATING);
 
                             plugin._trigger('onShow', { pane: $targetPane });
-                        });
+                        };
+                        _callRAF(beginActions);
                     },
                     complete: function() {
-                        window.requestAnimationFrame(function() {
+                        var completeActions = function() {
                             // Enforce only one pane to animate at a time
                             plugin.$navitron.removeClass(cssClasses.ANIMATING);
 
@@ -231,7 +249,8 @@
 
                             // Setting new controllable items for keyboard navigation
                             plugin.setFocusableItems($targetPane);
-                        });
+                        };
+                        _callRAF(completeActions);
                     }
                 })
             );
@@ -303,7 +322,7 @@
             var $content = $(template.CONTENT);
             var $button = $(template.BUTTON);
 
-            $listItems.each(function (index, item) {
+            $listItems.each(function(index, item) {
                 var $item = $(item);
                 var $nestedList = $item.children('ul');
 
@@ -559,7 +578,7 @@
                 var refreshIndex = 0;
 
                 if ($nestedLists.length) {
-                    $nestedLists.each(function (index, item) {
+                    $nestedLists.each(function(index, item) {
                         var $nestedList = $(item);
 
                         // Grabbing ul parent
@@ -578,7 +597,7 @@
                         $nestedList.attr('data-level', dataLevel + '.' + refreshIndex);
 
                         refreshIndex++;
-                    }); // jshint ignore:line
+                    });
 
                     selector += '> li > ul';
                 } else {
@@ -667,4 +686,4 @@
     $('[data-navitron]').navitron();
 
     return $;
-}));
+});

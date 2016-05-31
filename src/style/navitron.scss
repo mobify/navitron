@@ -33,9 +33,9 @@
 .navitron__pane {
     position: absolute; // 1
     top: 0;
-    left: 0;
     right: 0;
     bottom: 0;
+    left: 0;
 }
 
 
@@ -92,6 +92,7 @@
     transform: translate3d(0, 0, 0);
 
     -webkit-overflow-scrolling: touch;
+
     -webkit-backface-visibility: hidden; // 2
 
     .navitron--is-animating & {
@@ -117,8 +118,8 @@
 
 .navitron__wrapper {
     display: flex; // 1
-    flex-direction: column;
     overflow: hidden;
+    flex-direction: column;
     height: 100%;
 }
 
