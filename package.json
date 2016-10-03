@@ -55,7 +55,7 @@
   ],
   "author": "Mobify",
   "dependencies": {
-    "plugin": "git+https://github.com/mobify/plugin.git#3.1.0",
+    "mobify-plugin": "4.0.0",
     "requirejs": "2.2.0",
     "velocity-animate": "1.2.3"
   }

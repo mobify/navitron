@@ -34,7 +34,7 @@ We highly recommend using Require.js with Navitron. To use Require, you have to 
 {
     'paths': {
         '$': 'node_modules/navitron/node_modules/jquery/dist/jquery.min',
-        'plugin': 'node_modules/navitron/node_modules/plugin/dist/plugin.min',
+        'plugin': 'node_modules/navitron/node_modules/mobify-plugin/dist/plugin.min',
         'velocity': 'node_modules/navitron/node_modules/velocity-animate/velocity.min',
         'navitron': 'node_modules/navitron/dist/navitron.min'
     }
