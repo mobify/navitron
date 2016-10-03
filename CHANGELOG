@@ -1,3 +1,5 @@
+Pending Release
+    - Update Plugin dep to NPM published version
 1.0.0
     - Publish to NPM
     - Use jQuery and latest Velocity release
